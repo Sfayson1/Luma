@@ -50,3 +50,10 @@ You'll need a `.env` file like this:
 ```env
 DATABASE_URL=your-supabase-url
 JWT_SECRET=your-super-secret
+```
+
+### 🪪 License
+Coming soon...
+
+### 👤 Author
+Made with ❤️ by Sherika
