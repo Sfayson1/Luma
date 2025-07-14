@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import init_db
-from routers import users, posts, auth_routes, auth
+from routers import users, posts, auth, prompts
 
 app = FastAPI()
 
@@ -16,8 +16,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(prompts.router, prefix="/api/prompts", tags=["Prompts"])
 app.include_router(posts.router, prefix="/api/posts", tags=["Posts"])
-app.include_router(auth_routes.router, prefix="/api/auth", tags=["Auth"])
 app.include_router(users.router, prefix="/api/users", tags=["Users"])
 app.include_router(auth.router, prefix="/api/auth", tags=["Auth"])
 

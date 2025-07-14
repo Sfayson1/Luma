@@ -34,7 +34,7 @@ class UserOut(BaseModel):
     grad_class: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class Post(Base):
     __tablename__ = "posts"
@@ -42,9 +42,14 @@ class Post(Base):
     id = Column(Integer, primary_key=True, index=True)
     content = Column(Text, nullable=False)
     date_posted = Column(Date, default=date.today)
+    mood = Column(String, nullable=True)
+    privacy = Column(String, default="private")
+    tags = Column(String, nullable=True)
     owner_id = Column(Integer, ForeignKey("users.id"))
 
     owner = relationship("User", back_populates="posts")
+    prompt_id = Column(Integer, ForeignKey("prompts.id"), nullable=True)
+    prompt = relationship("Prompt", back_populates="posts")
 
 class PostIn(BaseModel):
     content: str
@@ -58,4 +63,13 @@ class PostOutWithUser(BaseModel):
     date_posted: date
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+class Prompt(Base):
+    __tablename__ = "prompts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    content = Column(String, nullable=False)
+    date_created = Column(Date, default=date.today)
+
+    posts = relationship("Post", back_populates="prompt")
