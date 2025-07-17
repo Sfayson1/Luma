@@ -1,4 +1,5 @@
 import random
+from datetime import date
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from schemas import PromptOut
@@ -23,17 +24,10 @@ prompt_of_the_day = {
 def get_prompt_of_the_day(db: Session = Depends(get_db)):
     today = date.today()
 
-    # Return cached prompt if it's for today
-    if prompt_of_the_day["date"] == today and prompt_of_the_day["prompt"]:
-        return prompt_of_the_day["prompt"]
-
-    # Otherwise fetch a new random prompt from the DB
     prompts = db.query(Prompt).all()
     if not prompts:
         raise HTTPException(status_code=404, detail="No prompts available")
 
-    new_prompt = random.choice(prompts)
-    prompt_of_the_day["date"] = today
-    prompt_of_the_day["prompt"] = new_prompt
-
-    return new_prompt
+    seed = today.toordinal() + len(prompts)
+    random.seed(seed)
+    return random.choice(prompts)

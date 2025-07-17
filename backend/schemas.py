@@ -8,10 +8,10 @@ class Token(BaseModel):
     token_type: str
 
 class TokenData(BaseModel):
-    username: Optional[str] = None
+    email: Optional[str] = None
 
 class UserLogin(BaseModel):
-    username: str
+    email: str
     password: str
 
 class UserCreate(BaseModel):
@@ -23,8 +23,10 @@ class UserCreate(BaseModel):
     password: str
 
 class UserOut(BaseModel):
-    id: int
+    id: str
     username: str
+    first_name: str
+    last_name: str
 
     class Config:
         from_attributes = True
@@ -45,13 +47,32 @@ class PostIn(BaseModel):
     mood: Optional[str] = None
     privacy: Optional[str] = "private"
     tags: Optional[str] = None
-    date_posted: Optional[date] = None
     prompt_id: Optional[int] = None
 
-class PostOutWithUser(PostIn):
+class PostOut(BaseModel):
     id: int
+    content: str
+    date_posted: date
+    mood: Optional[str] = None
+    privacy: str
+    tags: Optional[str] = None
+    owner_id: str
+    prompt_id: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+
+class PostOutWithUser(BaseModel):
+    id: int
+    content: str
+    date_posted: date
+    mood: Optional[str] = None
+    privacy: str
+    tags: Optional[str] = None
+    owner_id: str
+    prompt_id: Optional[int] = None
     owner: UserOut
-    prompt: Optional[PromptOut]
+    prompt: Optional[PromptOut] = None
 
     class Config:
         from_attributes = True
@@ -61,4 +82,3 @@ class PostUpdate(BaseModel):
     mood: Optional[str] = None
     privacy: Optional[str] = None
     tags: Optional[str] = None
-    date_posted: Optional[date] = None

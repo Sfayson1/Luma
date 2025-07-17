@@ -4,6 +4,10 @@ from sqlalchemy.orm import relationship
 from database import Base
 from pydantic import BaseModel, Field
 from datetime import date
+from sqlalchemy.dialects.postgresql import UUID
+import uuid
+from typing import Optional
+
 
 class User(Base):
     __tablename__ = "users"
@@ -45,22 +49,54 @@ class Post(Base):
     mood = Column(String, nullable=True)
     privacy = Column(String, default="private")
     tags = Column(String, nullable=True)
-    owner_id = Column(Integer, ForeignKey("users.id"))
-
-    owner = relationship("User", back_populates="posts")
+    owner_id = Column(UUID(as_uuid=True), nullable=False)
     prompt_id = Column(Integer, ForeignKey("prompts.id"), nullable=True)
+
     prompt = relationship("Prompt", back_populates="posts")
 
 class PostIn(BaseModel):
     content: str
-    date_posted: date = Field(default_factory=date.today)
+    mood: Optional[str] = None
+    privacy: Optional[str] = "private"
+    tags: Optional[str] = None
+    prompt_id: Optional[int] = None
+
+class PostCreate(BaseModel):
+    content: str
+    mood: Optional[str] = None
+    privacy: Optional[str] = "private"
+    tags: Optional[str] = None
+    prompt_id: Optional[int] = None
+
+class PostOut(BaseModel):
+    id: int
+    content: str
+    date_posted: date
+    mood: Optional[str] = None
+    privacy: str
+    tags: Optional[str] = None
+    owner_id: str
+    prompt_id: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+
+class PostUpdate(BaseModel):
+    content: Optional[str] = None
+    mood: Optional[str] = None
+    privacy: Optional[str] = None
+    tags: Optional[str] = None
 
 class PostOutWithUser(BaseModel):
     id: int
     content: str
-    owner_id: int
+    owner_id: str
     owner: UserOut
     date_posted: date
+    mood: Optional[str] = None
+    privacy: str
+    tags: Optional[str] = None
+    prompt_id: Optional[int] = None
 
     class Config:
         from_attributes = True

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from models import PostOutWithUser, PostIn, User, Post
+from models import PostOutWithUser, PostIn, User, Post, PostCreate, PostOut
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
 from database import get_db
@@ -14,23 +14,25 @@ def read_posts(db: Session = Depends(get_db), current_user: User = Depends(get_c
 
     return db.query(Post).filter((Post.privacy != "private") | (Post.owner_id == current_user.id)).all()
 
-@router.post("/", response_model=PostOutWithUser)
+@router.post("/posts", response_model=PostOut)
 def create_post(
-    post: PostIn,
+    post: PostCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user = Depends(get_current_user)
 ):
-    data = post.dict()
-    if not data.get("date_posted"):
-        data["date_posted"] = date.today()
+    db_post = Post(
+        content=post.content,
+        mood=post.mood,
+        privacy=post.privacy,
+        tags=post.tags,
+        prompt_id=post.prompt_id,
+        owner_id=current_user.id
+    )
 
-    data["owner_id"] = current_user.id
-
-    new_post = Post(**post.dict(), owner_id=current_user.id)
-    db.add(new_post)
+    db.add(db_post)
     db.commit()
-    db.refresh(new_post)
-    return new_post
+    db.refresh(db_post)
+    return db_post
 
 @router.get("/{post_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(
