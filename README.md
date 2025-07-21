@@ -5,7 +5,6 @@
 ---
 
 ### ✨ Features
-
 * 📓 **Daily Prompts** – A new reflective question every day to guide your thoughts.
 * 🎭 **Mood Tagging** – Tag your entries with expressive moods and emojis.
 * 🏷️ **Custom Tags** – Add personal or predefined topic tags like `#burnout` or `#school`.
@@ -15,14 +14,34 @@
 * ⚙️ **Edit & Delete** – Manage your entries with full control.
 * 🖥️ **Responsive UI** – Clean, accessible, and mobile-friendly interface.
 
+## 🆘 **Mental Health & Safety**
+* 🆘 **Crisis Support Resources** – Quick access to suicide prevention hotlines and mental health services.
+* 🔍 **Therapy Search Tools** – Find affordable therapy options and mental health professionals.
+* 📱 **Digital Wellness Tools** – Curated list of mental health apps and support platforms.
+* 🛡️ **Crisis Intervention** – Gentle support when concerning patterns are detected.
+---
+### ⚠️ Important Notice
+Luma is designed to support mental wellness through journaling and self-reflection. While we provide crisis resources and support information, Luma is not a substitute for professional mental health treatment. If you're experiencing a mental health crisis, please contact emergency services or a mental health professional immediately.
+
+**Crisis Support:** Call 988 (Suicide & Crisis Lifeline) for immediate help.
+---
+
+## ⚙️ **User Settings & Privacy**
+* 🔐 **Privacy Controls** – Manage default entry privacy and profile visibility.
+* 🔑 **Password Management** – Secure password reset and account security.
+* 🎨 **Display Customization** – Theme selection, typography, and accessibility options.
+* 📝 **Journal Preferences** – Writing goals, reminders, and prompt frequency.
+* 📊 **Data Export** – Download all your journal data in JSON format.
+
 ---
 
 ### 🧱 Built With
-
 * ⚛️ **React (TypeScript)** – Frontend SPA with component-driven UI.
 * ⚡ **FastAPI** – Backend with JWT auth and async endpoints.
 * 🛢️ **Supabase (PostgreSQL)** – Realtime DB + auth + storage.
 * 📊 **Recharts & Chart.js** – For visualizing analytics and streaks.
+* 🎨 **Tailwind CSS** – Utility-first styling for responsive design.
+* 🚀 **React Router** – Client-side routing and navigation..
 
 ---
 
@@ -64,11 +83,15 @@ npm run dev
 ---
 
 ### 📌 Roadmap
-
 * [x] Daily prompts & journaling interface
 * [x] Mood tagging with emojis
 * [x] Writing streaks + mood chart
 * [x] Filter entries by tag, mood, date
+* [x] Mental health crisis support resources
+* [x] Password reset & account management
+* [x] Comprehensive settings (privacy, display, journal preferences)
+* [x] Data export functionality
+* [ ] Crisis detection & intervention system
 * [ ] Mobile dark mode support
 * [ ] Customizable themes
 * [ ] Self-hosted deployment script
