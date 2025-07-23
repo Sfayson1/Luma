@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
 from sqlalchemy.orm import Session
 from jose import JWTError, jwt
 from fastapi.security import OAuth2PasswordBearer
@@ -46,3 +46,13 @@ def read_posts(
     current_user: User = Depends(get_current_user)
 ):
     return []
+
+@router.post("/api/auth/logout")
+async def logout(response: Response):
+    response.delete_cookie(
+        key="access_token",
+        httponly=True,
+        samesite="lax",
+        secure=True
+    )
+    return {"message": "Logged out successfully"}

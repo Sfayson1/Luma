@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { supabase } from "../supabaseClient";
+import { notificationService } from "../services/notificationService";
 
 type Props = {
   isOpen: boolean;
@@ -22,35 +23,116 @@ export default function JournalEntryModal({
   const [tags, setTags] = useState("");
   const [linkPrompt, setLinkPrompt] = useState(true);
   const [promptId] = useState<number | null>(currentPrompt?.id ?? null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
 
+  // Helper function to calculate user's current streak
+  const calculateUserStreak = async (userId: string): Promise<number> => {
+    try {
+      // Get user's recent posts ordered by date
+      const { data: posts } = await supabase
+        .from('posts')
+        .select('created_at')
+        .eq('owner_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(100); // Get last 100 posts to calculate streak
+
+      if (!posts || posts.length === 0) return 1; // First post
+
+      // Calculate consecutive days
+      const today = new Date();
+      const dates = posts.map(post => new Date(post.created_at).toDateString());
+      const uniqueDates = [...new Set(dates)]; // Remove duplicates (multiple posts per day)
+
+      let streak = 1; // Today counts as 1
+      let currentDate = new Date(today);
+      currentDate.setDate(currentDate.getDate() - 1); // Start from yesterday
+
+      for (const dateStr of uniqueDates.slice(1)) { // Skip today
+        const postDate = new Date(dateStr);
+        if (postDate.toDateString() === currentDate.toDateString()) {
+          streak++;
+          currentDate.setDate(currentDate.getDate() - 1);
+        } else {
+          break; // Streak broken
+        }
+      }
+
+      return streak;
+    } catch (error) {
+      console.error('Error calculating streak:', error);
+      return 1;
+    }
+  };
+
   const handleSubmit = async () => {
-    const postData = {
-      content: entry,
-      mood: mood || null,
-      privacy: privacy,
-      tags: tags || null,
-      owner_id: user.id,
-      prompt_id: linkPrompt && promptId ? promptId : null,
-      // Store current UTC time, but it will display in user's timezone
-      created_at: new Date().toISOString(),
-    };
+    if (isSubmitting) return; // Prevent double submission
 
-    console.log("Submitting post data:", postData);
+    setIsSubmitting(true);
 
-    const { error } = await supabase.from("posts").insert([postData]);
+    try {
+      const postData = {
+        content: entry,
+        mood: mood || null,
+        privacy: privacy,
+        tags: tags || null,
+        owner_id: user.id,
+        prompt_id: linkPrompt && promptId ? promptId : null,
+        // Store current UTC time, but it will display in user's timezone
+        created_at: new Date().toISOString(),
+      };
 
-    if (error) {
-      console.error("Failed to insert post:", error);
-    } else {
-      // Reset form and close
-      setEntry("");
-      setMood("");
-      setPrivacy("private");
-      setTags("");
-      onClose();
-      onSubmit(entry);
+
+
+      const { error } = await supabase.from("posts").insert([postData]);
+
+      if (error) {
+        console.error("Failed to insert post:", error);
+        throw error;
+      } else {
+
+
+        // 🎉 NEW: Check for streak milestones after successful submission
+        try {
+          const userStreak = await calculateUserStreak(user.id);
+
+
+          if (userStreak > 1) { // Only notify for streaks > 1 day
+            await notificationService.notifyStreakMilestone(user.id, userStreak);
+
+          }
+
+          // 📝 Optional: Create a journal reminder for tomorrow
+          // This could be done with a scheduled job, but for demo purposes:
+          if (userStreak === 1) {
+            // For new users, create a welcome notification
+            await notificationService.createNotification({
+              user_id: user.id,
+              type: 'welcome',
+              title: 'Welcome to journaling! 🌟',
+              message: 'Great job on your first entry! Try to write something every day to build a healthy habit.',
+              metadata: { first_entry: true }
+            });
+          }
+        } catch (notificationError) {
+          console.error('Error handling notifications:', notificationError);
+          // Don't let notification errors block the main flow
+        }
+
+        // Reset form and close
+        setEntry("");
+        setMood("");
+        setPrivacy("private");
+        setTags("");
+        onClose();
+        onSubmit(entry);
+      }
+    } catch (error) {
+      console.error("Error creating journal entry:", error);
+      alert("Failed to create journal entry. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -72,11 +154,6 @@ export default function JournalEntryModal({
             />
             <span className="text-sm text-gray-600">
               Link to today's prompt
-              {currentPrompt && linkPrompt && (
-                <span className="text-[#A78BFA] ml-1">
-                  (Prompt #{currentPrompt.id})
-                </span>
-              )}
             </span>
           </label>
         </div>
@@ -156,16 +233,24 @@ export default function JournalEntryModal({
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+            disabled={isSubmitting}
+            className="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            disabled={!entry.trim()}
-            className="px-6 py-2 rounded-lg bg-[#A78BFA] text-white hover:bg-[#93C5FD] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+            disabled={!entry.trim() || isSubmitting}
+            className="px-6 py-2 rounded-lg bg-[#A78BFA] text-white hover:bg-[#93C5FD] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
           >
-            Submit Entry
+            {isSubmitting ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Submitting...
+              </>
+            ) : (
+              'Submit Entry'
+            )}
           </button>
         </div>
       </div>

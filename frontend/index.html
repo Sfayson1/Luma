@@ -5,6 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@700&family=Cormorant+Garamond&display=swap" rel="stylesheet">
     <title>Luma</title>
+
+    <!-- 👇 Preload theme before React loads -->
+    <script>
+      (function () {
+        const mode = localStorage.getItem("luma-theme-mode") || "light";
+        const scheme = localStorage.getItem("luma-color-scheme") || "purple";
+
+        const shouldBeDark =
+          mode === "dark" ||
+          (mode === "system" &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+        if (shouldBeDark) {
+          document.documentElement.classList.add("dark");
+        }
+
+        document.documentElement.setAttribute("data-color-scheme", scheme);
+      })();
+    </script>
+    <!-- 👆 Ensure dark mode and color scheme are applied before mount -->
   </head>
   <body>
     <div id="root"></div>

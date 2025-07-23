@@ -1,0 +1,202 @@
+
+
+/* Base CSS Variables */
+:root {
+  /* Light mode colors */
+  --bg-primary: 255 255 255;
+  --bg-secondary: 249 250 251;
+  --bg-tertiary: 243 244 246;
+  --text-primary: 17 24 39;
+  --text-secondary: 75 85 99;
+  --text-tertiary: 156 163 175;
+  --border-primary: 229 231 235;
+  --border-secondary: 209 213 219;
+
+  /* Default purple scheme */
+  --primary: 167 139 250;
+  --primary-dark: 139 92 246;
+  --primary-light: 196 181 253;
+  --primary-bg: 245 243 255;
+  --primary-border: 221 214 254;
+}
+
+/* Dark mode */
+.dark {
+  --bg-primary: 17 24 39;
+  --bg-secondary: 31 41 55;
+  --bg-tertiary: 55 65 81;
+  --text-primary: 249 250 251;
+  --text-secondary: 209 213 219;
+  --text-tertiary: 156 163 175;
+  --border-primary: 75 85 99;
+  --border-secondary: 107 114 128;
+}
+
+/* Color Schemes */
+[data-color-scheme="purple"] {
+  --primary: 167 139 250;
+  --primary-dark: 139 92 246;
+  --primary-light: 196 181 253;
+  --primary-bg: 245 243 255;
+  --primary-border: 221 214 254;
+}
+
+[data-color-scheme="purple"].dark {
+  --primary: 196 181 253;
+  --primary-dark: 167 139 250;
+  --primary-light: 221 214 254;
+  --primary-bg: 55 48 163;
+  --primary-border: 109 40 217;
+}
+
+[data-color-scheme="blue"] {
+  --primary: 96 165 250;
+  --primary-dark: 59 130 246;
+  --primary-light: 147 197 253;
+  --primary-bg: 239 246 255;
+  --primary-border: 191 219 254;
+}
+
+[data-color-scheme="blue"].dark {
+  --primary: 147 197 253;
+  --primary-dark: 96 165 250;
+  --primary-light: 191 219 254;
+  --primary-bg: 30 58 138;
+  --primary-border: 29 78 216;
+}
+
+[data-color-scheme="green"] {
+  --primary: 74 222 128;
+  --primary-dark: 34 197 94;
+  --primary-light: 134 239 172;
+  --primary-bg: 236 253 245;
+  --primary-border: 187 247 208;
+}
+
+[data-color-scheme="green"].dark {
+  --primary: 134 239 172;
+  --primary-dark: 74 222 128;
+  --primary-light: 187 247 208;
+  --primary-bg: 20 83 45;
+  --primary-border: 21 128 61;
+}
+
+[data-color-scheme="pink"] {
+  --primary: 244 114 182;
+  --primary-dark: 236 72 153;
+  --primary-light: 249 168 212;
+  --primary-bg: 253 242 248;
+  --primary-border: 251 207 232;
+}
+
+[data-color-scheme="pink"].dark {
+  --primary: 249 168 212;
+  --primary-dark: 244 114 182;
+  --primary-light: 251 207 232;
+  --primary-bg: 131 24 67;
+  --primary-border: 190 24 93;
+}
+
+[data-color-scheme="indigo"] {
+  --primary: 129 140 248;
+  --primary-dark: 99 102 241;
+  --primary-light: 165 180 252;
+  --primary-bg: 238 242 255;
+  --primary-border: 199 210 254;
+}
+
+[data-color-scheme="indigo"].dark {
+  --primary: 165 180 252;
+  --primary-dark: 129 140 248;
+  --primary-light: 199 210 254;
+  --primary-bg: 55 48 163;
+  --primary-border: 79 70 229;
+}
+
+/* Utility classes using CSS variables */
+.bg-primary {
+  background-color: rgb(var(--bg-primary));
+}
+
+.bg-secondary {
+  background-color: rgb(var(--bg-secondary));
+}
+
+.bg-tertiary {
+  background-color: rgb(var(--bg-tertiary));
+}
+
+.text-primary {
+  color: rgb(var(--text-primary));
+}
+
+.text-secondary {
+  color: rgb(var(--text-secondary));
+}
+
+.text-tertiary {
+  color: rgb(var(--text-tertiary));
+}
+
+.border-primary {
+  border-color: rgb(var(--border-primary));
+}
+
+.border-secondary {
+  border-color: rgb(var(--border-secondary));
+}
+
+.bg-brand {
+  background-color: rgb(var(--primary));
+}
+
+.bg-brand-dark {
+  background-color: rgb(var(--primary-dark));
+}
+
+.bg-brand-light {
+  background-color: rgb(var(--primary-light));
+}
+
+.bg-brand-bg {
+  background-color: rgb(var(--primary-bg));
+}
+
+.text-brand {
+  color: rgb(var(--primary));
+}
+
+.text-brand-dark {
+  color: rgb(var(--primary-dark));
+}
+
+.border-brand {
+  border-color: rgb(var(--primary));
+}
+
+.border-brand-light {
+  border-color: rgb(var(--primary-border));
+}
+
+/* Smooth transitions for theme changes */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Custom scrollbar for dark mode */
+.dark ::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: rgb(var(--bg-secondary));
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgb(var(--border-primary));
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--border-secondary));
+}

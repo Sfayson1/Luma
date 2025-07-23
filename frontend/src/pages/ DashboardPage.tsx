@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import JournalEntryModal from "../components/JournalEntryModal";
 import { supabase } from "../supabaseClient";
 import Feed from "../components/FeedPost";
+import { notificationService } from '../services/notificationService';
+
 
 // Define the type for posts with profiles
 type PostWithProfile = {
@@ -29,16 +31,17 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   const handleJournalSubmit = async (entry: string) => {
-    console.log("Post submitted!");
     fetchPosts(); // Refresh the feed
     setIsModalOpen(false);
   };
 
   const fetchPosts = async () => {
-    console.log("fetchPosts called");
     try {
       // Get current user first
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
 
       if (userError || !user) {
         console.error("User not authenticated:", userError);
@@ -60,15 +63,12 @@ export default function DashboardPage() {
 
       // Get unique owner IDs from posts
       const ownerIds = [...new Set(posts?.map((post) => post.owner_id))];
-      console.log("Owner IDs from posts:", ownerIds);
 
       // Get profiles for those owners
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
         .select("*")
         .in("id", ownerIds);
-
-      console.log("Profiles data:", profiles, profilesError);
 
       // Combine posts with profiles
       const postsWithProfiles =
@@ -83,8 +83,6 @@ export default function DashboardPage() {
             },
           };
         }) || [];
-
-      console.log("Posts with profiles:", postsWithProfiles);
       setPosts(postsWithProfiles);
     } catch (error) {
       console.error("Failed to fetch posts:", error);
@@ -123,6 +121,32 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
+    const checkDailyReminder = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        // Check if user hasn't journaled today
+        const today = new Date().toISOString().split('T')[0];
+        const { data: todayPosts } = await supabase
+          .from('posts')
+          .select('id')
+          .eq('owner_id', user.id)
+          .gte('created_at', today + 'T00:00:00.000Z')
+          .lt('created_at', today + 'T23:59:59.999Z');
+
+        if (!todayPosts || todayPosts.length === 0) {
+          // User hasn't journaled today - check their reminder preferences
+          const preferences = await notificationService.getUserPreferences(user.id);
+          if (preferences?.reminder_enabled) {
+            // Could show in-app reminder or send notification
+          }
+        }
+      }
+    };
+
+    checkDailyReminder();
+  }, []);
+
+  useEffect(() => {
     const initializeDashboard = async () => {
       setLoading(true);
 
@@ -145,43 +169,57 @@ export default function DashboardPage() {
     initializeDashboard();
   }, []);
 
+  // Get dynamic button colors based on current color scheme
+
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center">
-        <div className="text-lg text-gray-600">Loading...</div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center transition-colors duration-300">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto mb-4"></div>
+          <div className="text-lg text-gray-600 dark:text-gray-300 transition-colors duration-300">
+            Loading your journal...
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] font-['Inter']">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-4xl mx-auto px-6 py-6 text-center">
-          <div className="text-4xl font-['Playfair_Display'] font-bold text-[#A78BFA]">
-            Luma
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 font-['Inter'] transition-colors duration-300">
 
       <div className="px-6 py-16">
-        <div className="max-w-xl mx-auto bg-white p-8 rounded-2xl shadow-md">
-          <h3 className="font-['Playfair_Display'] text-2xl font-semibold text-[#1F2937] mb-4">
+        <div className="max-w-xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+          <h3 className="font-['Playfair_Display'] text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4 transition-colors duration-300">
             Prompt of the Day
           </h3>
-          <p className="text-[#6B7280] mb-4 leading-relaxed">
+          <p className="bg-[#A78BFA]text-gray-600 dark:text-gray-300 mb-6 leading-relaxed transition-colors duration-300">
             {currentPrompt?.content}
           </p>
-          {currentPrompt?.id && (
-            <p className="text-xs text-[#6B7280] mb-4">
-              Prompt ID: {currentPrompt.id}
-            </p>
-          )}
           <button
             onClick={() => setIsModalOpen(true)}
             className="bg-[#A78BFA] hover:bg-[#93C5FD] text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1"
           >
-            Journal Entry
+            ✨ Start Writing
           </button>
+        </div>
+
+        {/* Daily Progress Card */}
+        <div className="max-w-xl mx-auto mt-6 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="font-medium text-gray-800 dark:text-gray-100 transition-colors duration-300">
+                Today's Progress
+              </h4>
+              <p className="text-sm text-gray-600 dark:text-gray-400 transition-colors duration-300">
+                Keep your streak going!
+              </p>
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">🔥</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">Streak</div>
+            </div>
+          </div>
         </div>
       </div>
 

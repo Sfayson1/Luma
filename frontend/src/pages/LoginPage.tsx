@@ -10,27 +10,92 @@ export default function LoginPage() {
   });
 
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
+  // Test function to create a user (for debugging)
+  const testCreateUser = async () => {
+    const testEmail = "test@example.com";
+    const testPassword = "testpassword123";
 
-    const { email, password } = formData;
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+    console.log("Creating test user...");
+    const { data, error } = await supabase.auth.signUp({
+      email: testEmail,
+      password: testPassword,
     });
 
     if (error) {
-      console.error("Login failed:", error.message);
-      setError("Invalid email or password.");
+      console.error("Test signup failed:", error);
     } else {
-      navigate("/dashboard");
+      console.log("Test user created successfully:", data);
+      alert(`Test user created with email: ${testEmail}`);
+    }
+  };
+
+  // Test Supabase connection
+  const testConnection = async () => {
+    console.log("Testing Supabase connection...");
+    try {
+      const { data, error } = await supabase.auth.getSession();
+      console.log("Session test result:", { data, error });
+
+      // Test a simple query that doesn't require admin
+      const { data: userData, error: userError } =
+        await supabase.auth.getUser();
+      console.log("Get user test:", { userData, userError });
+
+      alert("Connection test complete - check console for details");
+    } catch (err) {
+      console.error("Connection test failed:", err);
+    }
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    const { email, password } = formData;
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
+      });
+
+      console.log("=== LOGIN RESPONSE ===");
+      console.log("Data:", data);
+      console.log("Error:", error);
+
+      if (error) {
+        console.error("Login failed - Full error:", error);
+        console.error("Error message:", error.message);
+        console.error("Error status:", error.status);
+
+        // More specific error handling
+        if (error.message === "Invalid login credentials") {
+          setError(
+            "Email or password is incorrect. Please check your credentials."
+          );
+        } else if (error.message.includes("Email not confirmed")) {
+          setError(
+            "Please check your email and confirm your account before logging in."
+          );
+        } else {
+          setError(`Login failed: ${error.message}`);
+        }
+      } else {
+        console.log("Login successful! User:", data.user);
+        navigate("/dashboard");
+      }
+    } catch (err) {
+      console.error("Unexpected error during login:", err);
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,49 +120,68 @@ export default function LoginPage() {
           </p>
 
           <form onSubmit={handleLogin} className="space-y-4">
-            {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+            {/* Display error message if present */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
+                {error}
+              </div>
+            )}
 
             <div>
-              <label className="block text-[#1F2937] text-sm font-medium mb-1">
+              <label
+                htmlFor="email"
+                className="block text-[#1F2937] text-sm font-medium mb-1"
+              >
                 Email
               </label>
               <input
                 type="email"
+                id="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Email"
                 required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#A78BFA] focus:border-transparent"
+                disabled={loading}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#A78BFA] focus:border-transparent disabled:bg-gray-100"
               />
             </div>
 
             <div>
-              <label className="block text-[#1F2937] text-sm font-medium mb-1">
+              <label
+                htmlFor="password"
+                className="block text-[#1F2937] text-sm font-medium mb-1"
+              >
                 Password
               </label>
               <input
                 type="password"
+                id="password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Password"
                 required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#A78BFA] focus:border-transparent"
+                disabled={loading}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#A78BFA] focus:border-transparent disabled:bg-gray-100"
               />
             </div>
 
             <div className="text-right text-sm">
-              <a href="#" className="text-[#A78BFA] hover:underline">
+              <Link
+                to="/forgot-password"
+                className="text-[#A78BFA] hover:underline"
+              >
                 Forgot password?
-              </a>
+              </Link>
             </div>
 
             <button
               type="submit"
-              className="w-full bg-[#A78BFA] hover:bg-[#93C5FD] text-white py-3 px-4 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1"
+              disabled={loading}
+              className="w-full bg-[#A78BFA] hover:bg-[#93C5FD] text-white py-3 px-4 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
-              Log In
+              {loading ? "Logging in..." : "Log In"}
             </button>
           </form>
 

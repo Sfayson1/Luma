@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import { supabase } from "../supabaseClient";
+import  ProfileAvatar  from "../components/ProfileAvatar";
 
 // Mood to emoji mapping
 const moodMap: { [key: string]: string } = {
@@ -14,7 +15,7 @@ const moodMap: { [key: string]: string } = {
   tired: "😴",
   grateful: "🙏",
   peaceful: "☮️",
-  other: "💭"
+  other: "💭",
 };
 
 type Post = {
@@ -54,10 +55,14 @@ const moodColors: Record<string, string> = {
   other: "bg-gray-200 text-gray-800",
 };
 
-const FeedPost = ({ post, currentUserId, onPostUpdated }: {
-  post: Post,
-  currentUserId: string,
-  onPostUpdated: () => void
+const FeedPost = ({
+  post,
+  currentUserId,
+  onPostUpdated,
+}: {
+  post: Post;
+  currentUserId: string;
+  onPostUpdated: () => void;
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content);
@@ -73,13 +78,13 @@ const FeedPost = ({ post, currentUserId, onPostUpdated }: {
   let formattedDate = "Unknown date";
   if (post.created_at) {
     try {
-      const utcTimestamp = post.created_at.includes('Z')
+      const utcTimestamp = post.created_at.includes("Z")
         ? post.created_at
-        : post.created_at + 'Z';
+        : post.created_at + "Z";
       const postDate = new Date(utcTimestamp);
       formattedDate = formatDistanceToNow(postDate, {
         addSuffix: true,
-        includeSeconds: true
+        includeSeconds: true,
       });
     } catch (error) {
       console.error("Error parsing date:", error);
@@ -118,16 +123,17 @@ const FeedPost = ({ post, currentUserId, onPostUpdated }: {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this journal entry? This action cannot be undone.")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this journal entry? This action cannot be undone."
+      )
+    ) {
       return;
     }
 
     setIsDeleting(true);
     try {
-      const { error } = await supabase
-        .from("posts")
-        .delete()
-        .eq("id", post.id);
+      const { error } = await supabase.from("posts").delete().eq("id", post.id);
 
       if (error) {
         console.error("Failed to delete post:", error);
@@ -155,16 +161,20 @@ const FeedPost = ({ post, currentUserId, onPostUpdated }: {
     return (
       <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border-2 border-[#A78BFA]">
         <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-full bg-[#A78BFA] flex items-center justify-center text-white font-medium">
-            {post.profiles
-              ? `${post.profiles.first_name[0]}${post.profiles.last_name[0]}`.toUpperCase()
-              : post.owner_id.substring(0, 2).toUpperCase()
+          <ProfileAvatar
+            userId={post.owner_id}
+            fallbackInitials={
+              post.profiles
+                ? `${post.profiles.first_name[0]}${post.profiles.last_name[0]}`.toUpperCase()
+                : post.owner_id.substring(0, 2).toUpperCase()
             }
-          </div>
+          />
           <div className="flex-1">
             <div className="mb-4">
               <p className="font-medium text-[#1F2937] mb-1">{displayName}</p>
-              <span className="text-xs text-[#6B7280]">Editing • {formattedDate}</span>
+              <span className="text-xs text-[#6B7280]">
+                Editing • {formattedDate}
+              </span>
             </div>
 
             {/* Edit form */}
@@ -259,12 +269,14 @@ const FeedPost = ({ post, currentUserId, onPostUpdated }: {
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 mb-6 group">
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-full bg-[#A78BFA] flex items-center justify-center text-white font-medium">
-          {post.profiles
-            ? `${post.profiles.first_name[0]}${post.profiles.last_name[0]}`.toUpperCase()
-            : post.owner_id.substring(0, 2).toUpperCase()
+        <ProfileAvatar
+          userId={post.owner_id}
+          fallbackInitials={
+            post.profiles
+              ? `${post.profiles.first_name[0]}${post.profiles.last_name[0]}`.toUpperCase()
+              : post.owner_id.substring(0, 2).toUpperCase()
           }
-        </div>
+        />
         <div className="flex-1">
           <div className="flex justify-between items-start mb-2">
             <div className="flex-1">
@@ -279,7 +291,9 @@ const FeedPost = ({ post, currentUserId, onPostUpdated }: {
                   {post.mood && (
                     <span
                       className={`text-lg px-2 py-1 rounded-full ${moodStyle}`}
-                      title={post.mood.charAt(0).toUpperCase() + post.mood.slice(1)}
+                      title={
+                        post.mood.charAt(0).toUpperCase() + post.mood.slice(1)
+                      }
                     >
                       {moodMap[post.mood] || "📝"}
                     </span>
@@ -293,8 +307,18 @@ const FeedPost = ({ post, currentUserId, onPostUpdated }: {
                         className="p-2 text-gray-400 hover:text-[#A78BFA] hover:bg-gray-100 rounded-lg transition-colors"
                         title="Edit post"
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                          />
                         </svg>
                       </button>
                       <button
@@ -306,8 +330,18 @@ const FeedPost = ({ post, currentUserId, onPostUpdated }: {
                         {isDeleting ? (
                           <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
                         ) : (
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
                           </svg>
                         )}
                       </button>
@@ -325,7 +359,7 @@ const FeedPost = ({ post, currentUserId, onPostUpdated }: {
           {/* Tags display */}
           {post.tags && (
             <div className="mt-3 flex flex-wrap gap-1">
-              {post.tags.split(',').map((tag, index) => (
+              {post.tags.split(",").map((tag, index) => (
                 <span
                   key={index}
                   className="text-xs px-2 py-1 bg-[#F9FAFB] text-[#6B7280] rounded-full"

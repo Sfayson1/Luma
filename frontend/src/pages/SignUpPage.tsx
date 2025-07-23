@@ -189,8 +189,9 @@ if (data?.user) {
           </p>
 
           <p className="mt-2 text-sm text-center text-[#6B7280]">
-            <Link to="/" className="hover:underline text-[#6B7280]">
-              ← Back to Luma
+            By creating an account, you agree to our{' '}
+            <Link to="/terms" className="hover:underline text-[#6B7280]">
+              Terms of Service
             </Link>
           </p>
         </div>
