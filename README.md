@@ -111,6 +111,15 @@ VITE_API_URL=http://localhost:8000
 
 ---
 
+🌐 Live Demo
+Coming soon via Vercel
+
+---
+
+📄 License
+This project is licensed under the MIT License.
+
+
 ### 👤 Author
 
 Made with ❤️ by [Sherika Fayson](https://github.com/sherikafayson)
