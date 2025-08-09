@@ -92,8 +92,8 @@ npm run dev
 * [x] Comprehensive settings (privacy, display, journal preferences)
 * [x] Data export functionality
 * [ ] Crisis detection & intervention system
-* [ ] Mobile dark mode support
-* [ ] Customizable themes
+* [x] Mobile dark mode support
+* [x] Customizable themes
 * [ ] Self-hosted deployment script
 
 ---
