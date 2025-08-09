@@ -2,7 +2,6 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Heart } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,14 +23,19 @@ interface DashboardHeaderProps {
   onTabChange: (tab: "entries" | "analytics" | "resources") => void;
 }
 
-export const DashboardHeader = ({
-  userName,
-  avatarUrl,
-  activeTab,
-  onTabChange,
-}: DashboardHeaderProps) => {
+export const DashboardHeader = ({ userName, avatarUrl, activeTab, onTabChange }: DashboardHeaderProps) => {
   const { signOut } = useAuth();
   const navigate = useNavigate();
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .filter((word: string) => word.length > 0)
+      .map((word: string) => word[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   const getTabClasses = (tab: string) =>
     activeTab === tab
@@ -40,45 +44,34 @@ export const DashboardHeader = ({
 
   return (
     <header
-      className="  bg-[hsl(var(--color-background)_/_0.95)] backdrop-blur supports-[backdrop-filter]:bg-[hsl(var(--color-background)_/_0.6)]"
-      style={{ border: "1px solid hsl(var(--color-border))" }}
+      className="bg-[hsl(var(--color-background)_/_0.95)] backdrop-blur supports-[backdrop-filter]:bg-[hsl(var(--color-background)_/_0.6)]"
+      style={{ border: '1px solid hsl(var(--color-border))' }}
     >
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-8">
-            <h1 className="text-2xl font-bold text-[hsl(var(--color-primary))] flex items-center gap-2">
-              <div className="h-8 w-8 rounded-full bg-[linear-gradient(to_bottom_right,hsl(var(--color-primary)),hsl(var(--color-healing)))] flex items-center justify-center">
-                <Heart className="h-4 w-4 text-[hsl(var(--color-primary-foreground))]" />
-              </div>
-              Luma
-            </h1>
+            <h1 className="text-2xl font-bold text-[hsl(var(--color-primary))]">Luma</h1>
 
             {/* Navigation Tabs */}
             <nav className="hidden md:flex items-center space-x-8">
               <button
                 onClick={() => onTabChange("entries")}
-                className={`flex items-center gap-2 py-2 text-sm font-medium transition-colors ${getTabClasses(
-                  "entries"
-                )}`}
+                className={`flex items-center gap-2 py-2 text-sm font-medium transition-colors ${getTabClasses("entries")}`}
               >
                 <BookOpen className="h-4 w-4" />
                 My Entries
               </button>
               <button
                 onClick={() => onTabChange("analytics")}
-                className={`flex items-center gap-2 py-2 text-sm font-medium transition-colors ${getTabClasses(
-                  "analytics"
-                )}`}
+                className={`flex items-center gap-2 py-2 text-sm font-medium transition-colors ${getTabClasses("analytics")}`}
               >
                 <BarChart3 className="h-4 w-4" />
                 Analytics
               </button>
               <button
                 onClick={() => onTabChange("resources")}
-                className={`flex items-center gap-2 py-2 text-sm font-medium transition-colors ${getTabClasses(
-                  "resources"
-                )}`}
+                className={`flex items-center gap-2 py-2 text-sm font-medium transition-colors ${getTabClasses("resources")}`}
               >
                 <HelpCircle className="h-4 w-4" />
                 Resources
@@ -94,36 +87,29 @@ export const DashboardHeader = ({
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="flex items-center gap-2 px-3 py-2 h-auto hover:bg-[hsl(var(--color-accent))]"
+                  className="flex items-center gap-2 px-3 py-2 h-auto hover:bg-[hsl(var(--color-accent))] text-[hsl(var(--color-foreground))]"
                 >
                   <Avatar className="h-8 w-8">
                     {avatarUrl ? (
-                      <AvatarImage
-                        src={avatarUrl ?? undefined}
-                        alt={userName}
-                      />
+                      <AvatarImage src={avatarUrl ?? undefined} alt={userName} />
                     ) : null}
                     <AvatarFallback className="bg-[hsl(var(--color-primary)_/_0.1)] text-[hsl(var(--color-primary))] font-medium text-sm">
-                      {userName
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
+                      {getInitials(userName)}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="text-sm font-medium hidden sm:block">
-                    {userName}
-                  </span>
+                  <span className="text-sm font-medium hidden sm:block text-[hsl(var(--color-foreground))]">{userName}</span>
                 </Button>
               </DropdownMenuTrigger>
 
               <DropdownMenuContent
-                className="w-64 bg-[hsl(var(--color-background))] border border-[hsl(var(--color-border))] shadow-[var(--shadow-warm)] z-50"
+                className="w-64 bg-[hsl(var(--color-background))] shadow-[var(--shadow-warm)] z-50"
                 align="end"
                 sideOffset={5}
+                style={{ border: '1px solid hsl(var(--color-border))' }}
               >
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">
+                    <p className="text-sm font-medium leading-none text-[hsl(var(--color-foreground))]">
                       {userName}
                     </p>
                     <p className="text-xs leading-none text-[hsl(var(--color-muted-foreground))]">
@@ -135,8 +121,8 @@ export const DashboardHeader = ({
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem
-                  onClick={() => navigate("/settings")}
-                  className="cursor-pointer"
+                  onClick={() => navigate('/settings')}
+                  className="cursor-pointer text-[hsl(var(--color-foreground))] hover:bg-[hsl(var(--color-accent))]"
                 >
                   <User className="mr-2 h-4 w-4" />
                   <span>Settings</span>
@@ -146,7 +132,7 @@ export const DashboardHeader = ({
 
                 <DropdownMenuItem
                   onClick={signOut}
-                  className="cursor-pointer text-[hsl(var(--color-destructive))] focus:text-[hsl(var(--color-destructive))]"
+                  className="cursor-pointer text-[hsl(var(--color-destructive))] hover:bg-[hsl(var(--color-destructive)_/_0.1)] focus:text-[hsl(var(--color-destructive))]"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Sign Out</span>

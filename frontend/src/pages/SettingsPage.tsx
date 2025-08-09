@@ -12,15 +12,16 @@ import { ThemeCustomizer } from '@/components/ui/theme-customizer';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { webPushService } from '@/lib/webPushService';
+
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/components/ui/theme-provider';
+import { NotificationSettingsInline } from '@/components/ui/notification-settings-inline';
 
 interface SettingsPageProps {
   onBack?: () => void;
 }
 
-const SettingsPage: React.FC<SettingsPageProps> = ({ onBack }) => {
+ const SettingsPage: React.FC<SettingsPageProps> = ({ onBack }) => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const [currentPage, setCurrentPage] = useState('menu');
@@ -106,30 +107,29 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ onBack }) => {
         return (
           <div className="max-w-2xl mx-auto bg-[hsl(var(--color-background))] min-h-screen">
             {/* Header */}
-            <div className="px-6 py-4" style={{ borderBottom: '1px solid hsl(var(--color-border))' }}>
+            <div className="border-b border-[hsl(var(--color-border))] px-6 py-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <Button variant="ghost" size="icon" onClick={() => navigate('/dashboard')}>
-                    <ArrowLeft className="h-5 w-5" />
+                    <ArrowLeft className="h-5 w-5 text-[hsl(var(--color-foreground))]" />
                   </Button>
                   <h1 className="text-2xl font-bold text-[hsl(var(--color-foreground))]">Settings</h1>
                 </div>
-                <Button variant="outline" onClick={() => navigate('/dashboard')} style={{ border: '1px solid hsl(var(--color-border))' }}>
+                <Button variant="outline" onClick={() => navigate('/dashboard')}>
                   Done
                 </Button>
               </div>
             </div>
 
             {/* Menu Items */}
-            <div style={{ borderBottom: '1px solid hsl(var(--color-border))' }}>
-              {menuItems.map((item, index) => {
+            <div className="divide-y divide-[hsl(var(--color-border))]">
+              {menuItems.map((item) => {
                 const IconComponent = item.icon;
                 return (
                   <button
                     key={item.id}
                     onClick={item.onClick}
                     className="w-full px-6 py-4 text-left hover:bg-[hsl(var(--color-accent))] transition-colors active:bg-[hsl(var(--color-accent)_/_0.8)]"
-                    style={{ borderBottom: index < menuItems.length - 1 ? '1px solid hsl(var(--color-border))' : 'none' }}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
@@ -151,12 +151,11 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ onBack }) => {
             </div>
 
             {/* Footer with navigation back to dashboard */}
-            <div className="p-6" style={{ borderTop: '1px solid hsl(var(--color-border))' }}>
+            <div className="p-6 border-t border-[hsl(var(--color-border))]">
               <Button
                 variant="outline"
                 className="w-full"
                 onClick={() => navigate('/dashboard')}
-                style={{ border: '1px solid hsl(var(--color-border))' }}
               >
                 Back to Dashboard
               </Button>
@@ -166,7 +165,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ onBack }) => {
             <div className="px-6 pb-6">
               <Button
                 variant="destructive"
-                className="w-full bg-[hsl(var(--color-destructive))] text-[hsl(var(--color-destructive-foreground))] hover:bg-[hsl(var(--color-destructive)_/_0.9)]"
+                className="w-full"
                 onClick={signOut}
               >
                 Sign Out
@@ -249,10 +248,10 @@ const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) =>
   return (
     <div className="max-w-2xl mx-auto bg-[hsl(var(--color-background))] min-h-screen">
       {/* Header */}
-      <div className="px-6 py-4" style={{ borderBottom: '1px solid hsl(var(--color-border))' }}>
+      <div className="border-b border-[hsl(var(--color-border))] px-6 py-4">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={onBack}>
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-5 w-5 text-[hsl(var(--color-foreground))]" />
           </Button>
           <h1 className="text-xl font-semibold text-[hsl(var(--color-foreground))]">Edit Profile</h1>
         </div>
@@ -260,7 +259,7 @@ const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) =>
 
       {/* Content */}
       <div className="p-6 space-y-6">
-        <Card style={{ border: '1px solid hsl(var(--color-border))' }}>
+        <Card className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))]">
           <CardHeader>
             <CardTitle className="text-[hsl(var(--color-foreground))]">Profile Picture</CardTitle>
           </CardHeader>
@@ -282,7 +281,7 @@ const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) =>
 
               <div className="flex gap-2">
                 <Label htmlFor="avatar-upload" className="cursor-pointer">
-                  <Button variant="outline" asChild style={{ border: '1px solid hsl(var(--color-border))' }}>
+                  <Button variant="outline" asChild>
                     <span>
                       <Upload className="h-4 w-4 mr-2" />
                       Change Photo
@@ -297,11 +296,7 @@ const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) =>
                   />
                 </Label>
                 {(avatarPreview || profile.avatar) && (
-                  <Button
-                    variant="destructive"
-                    onClick={removeAvatar}
-                    className="bg-[hsl(var(--color-destructive))] text-[hsl(var(--color-destructive-foreground))] hover:bg-[hsl(var(--color-destructive)_/_0.9)]"
-                  >
+                  <Button variant="destructive" onClick={removeAvatar}>
                     <X className="h-4 w-4 mr-2" />
                     Remove
                   </Button>
@@ -311,56 +306,52 @@ const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) =>
           </CardContent>
         </Card>
 
-        <Card style={{ border: '1px solid hsl(var(--color-border))' }}>
+        <Card className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))]">
           <CardHeader>
             <CardTitle className="text-[hsl(var(--color-foreground))]">Personal Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="firstName" className="text-[hsl(var(--color-foreground))] font-medium">First Name</Label>
+                <Label htmlFor="firstName" className="text-[hsl(var(--color-foreground))]">First Name</Label>
                 <Input
                   id="firstName"
                   value={profile.firstName}
                   onChange={(e) => setProfile(prev => ({ ...prev, firstName: e.target.value }))}
-                  className="bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))] placeholder:text-[hsl(var(--color-muted-foreground))]"
-                  style={{ border: '1px solid hsl(var(--color-border))' }}
+                  className="bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))] border-[hsl(var(--color-border))]"
                 />
               </div>
               <div>
-                <Label htmlFor="lastName" className="text-[hsl(var(--color-foreground))] font-medium">Last Name</Label>
+                <Label htmlFor="lastName" className="text-[hsl(var(--color-foreground))]">Last Name</Label>
                 <Input
                   id="lastName"
                   value={profile.lastName}
                   onChange={(e) => setProfile(prev => ({ ...prev, lastName: e.target.value }))}
-                  className="bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))] placeholder:text-[hsl(var(--color-muted-foreground))]"
-                  style={{ border: '1px solid hsl(var(--color-border))' }}
+                  className="bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))] border-[hsl(var(--color-border))]"
                 />
               </div>
             </div>
 
             <div>
-              <Label htmlFor="email" className="text-[hsl(var(--color-foreground))] font-medium">Email</Label>
+              <Label htmlFor="email" className="text-[hsl(var(--color-foreground))]">Email</Label>
               <Input
                 id="email"
                 type="email"
                 value={profile.email}
                 onChange={(e) => setProfile(prev => ({ ...prev, email: e.target.value }))}
-                className="bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))] placeholder:text-[hsl(var(--color-muted-foreground))]"
-                style={{ border: '1px solid hsl(var(--color-border))' }}
+                className="bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))] border-[hsl(var(--color-border))]"
               />
             </div>
 
             <div>
-              <Label htmlFor="bio" className="text-[hsl(var(--color-foreground))] font-medium">Bio</Label>
+              <Label htmlFor="bio" className="text-[hsl(var(--color-foreground))]">Bio</Label>
               <Textarea
                 id="bio"
                 value={profile.bio}
                 onChange={(e) => setProfile(prev => ({ ...prev, bio: e.target.value }))}
                 placeholder="Write a short bio about yourself..."
                 rows={3}
-                className="bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))] placeholder:text-[hsl(var(--color-muted-foreground))]"
-                style={{ border: '1px solid hsl(var(--color-border))' }}
+                className="bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))] border-[hsl(var(--color-border))] placeholder:text-[hsl(var(--color-muted-foreground))]"
               />
               <div className="text-xs text-[hsl(var(--color-muted-foreground))] mt-1">
                 {profile.bio.length}/150 characters
@@ -425,17 +416,17 @@ const PrivacySettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   return (
     <div className="max-w-2xl mx-auto bg-[hsl(var(--color-background))] min-h-screen">
-      <div className="px-6 py-4" style={{ borderBottom: '1px solid hsl(var(--color-border))' }}>
+      <div className="border-b border-[hsl(var(--color-border))] px-6 py-4">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={onBack}>
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-5 w-5 text-[hsl(var(--color-foreground))]" />
           </Button>
           <h1 className="text-xl font-semibold text-[hsl(var(--color-foreground))]">Privacy & Security</h1>
         </div>
       </div>
 
       <div className="p-6 space-y-6">
-        <Card style={{ border: '1px solid hsl(var(--color-border))' }}>
+        <Card className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))]">
           <CardHeader>
             <CardTitle className="text-[hsl(var(--color-foreground))]">Visibility</CardTitle>
           </CardHeader>
@@ -464,7 +455,7 @@ const PrivacySettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           </CardContent>
         </Card>
 
-        <Card style={{ border: '1px solid hsl(var(--color-border))' }}>
+        <Card className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))]">
           <CardHeader>
             <CardTitle className="text-[hsl(var(--color-foreground))]">Interactions</CardTitle>
           </CardHeader>
@@ -498,31 +489,16 @@ const PrivacySettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                   placeholder="Username or email"
                   value={blockInput}
                   onChange={(e) => setBlockInput(e.target.value)}
-                  className="bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))] placeholder:text-[hsl(var(--color-muted-foreground))]"
-                  style={{ border: '1px solid hsl(var(--color-border))' }}
+                  className="bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))] border-[hsl(var(--color-border))] placeholder:text-[hsl(var(--color-muted-foreground))]"
                 />
-                <Button
-                  onClick={addBlocked}
-                  className="bg-[hsl(var(--color-primary))] text-[hsl(var(--color-primary-foreground))] hover:bg-[hsl(var(--color-primary)_/_0.9)]"
-                >
-                  Block
-                </Button>
+                <Button onClick={addBlocked} className="bg-[hsl(var(--color-primary))] text-[hsl(var(--color-primary-foreground))] hover:bg-[hsl(var(--color-primary)_/_0.9)]">Block</Button>
               </div>
               {settings.blockedUsers.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-2">
                   {settings.blockedUsers.map((u) => (
-                    <span
-                      key={u}
-                      className="px-2 py-1 rounded-full text-xs bg-[hsl(var(--color-muted))] text-[hsl(var(--color-foreground))]"
-                      style={{ border: '1px solid hsl(var(--color-border))' }}
-                    >
+                    <span key={u} className="px-2 py-1 rounded-full text-xs bg-[hsl(var(--color-muted))] text-[hsl(var(--color-foreground))] border border-[hsl(var(--color-border))]">
                       {u}
-                      <button
-                        className="ml-2 text-[hsl(var(--color-muted-foreground))] hover:text-[hsl(var(--color-foreground))]"
-                        onClick={() => removeBlocked(u)}
-                      >
-                        ×
-                      </button>
+                      <button className="ml-2 text-[hsl(var(--color-muted-foreground))] hover:text-[hsl(var(--color-foreground))]" onClick={() => removeBlocked(u)}>×</button>
                     </span>
                   ))}
                 </div>
@@ -531,7 +507,7 @@ const PrivacySettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           </CardContent>
         </Card>
 
-        <Card style={{ border: '1px solid hsl(var(--color-border))' }}>
+        <Card className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))]">
           <CardHeader>
             <CardTitle className="text-[hsl(var(--color-foreground))]">Data & Security</CardTitle>
           </CardHeader>
@@ -555,153 +531,20 @@ const PrivacySettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
 const NotificationSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { toast } = useToast();
-  const [isSupported, setIsSupported] = useState(false);
-  const [permission, setPermission] = useState<NotificationPermission>('default');
-  const [settings, setSettings] = useState({
-    pushNotifications: false,
-    writingReminders: true,
-    likeNotifications: true,
-    achievementNotifications: true,
-    systemNotifications: true,
-  });
-
-  React.useEffect(() => {
-    setIsSupported(webPushService.isSupported());
-    setPermission(webPushService.getPermissionStatus());
-    const saved = localStorage.getItem('notification-settings');
-    if (saved) {
-      try { setSettings(JSON.parse(saved)); } catch {}
-    }
-  }, []);
-
-  const saveSettings = (next: typeof settings) => {
-    setSettings(next);
-    localStorage.setItem('notification-settings', JSON.stringify(next));
-  };
-
-  const handleEnablePush = async () => {
-    try {
-      const newPerm = await webPushService.requestPermission();
-      setPermission(newPerm);
-      if (newPerm === 'granted') {
-        await webPushService.initialize();
-        saveSettings({ ...settings, pushNotifications: true });
-        await webPushService.showWelcomeNotification();
-        toast({ title: 'Push notifications enabled', description: 'You will receive important updates.' });
-      } else {
-        toast({ title: 'Permission denied', description: 'Allow notifications in your browser settings.', variant: 'destructive' });
-      }
-    } catch {
-      toast({ title: 'Error', description: 'Failed to enable push notifications.', variant: 'destructive' });
-    }
-  };
-
-  const handleDisablePush = () => {
-    saveSettings({ ...settings, pushNotifications: false });
-    toast({ title: 'Push notifications disabled' });
-  };
-
-  const handleTest = async () => {
-    if (permission !== 'granted') {
-      toast({ title: 'Enable notifications first', description: 'Please enable push notifications to test them.', variant: 'destructive' });
-      return;
-    }
-    try {
-      await webPushService.showNotification({ title: 'Test Notification 🧪', body: 'This is a test notification from Luma.', tag: 'test' });
-      toast({ title: 'Test notification sent!', description: 'Check if you received the browser notification.' });
-    } catch {
-      toast({ title: 'Error', description: 'Failed to send test notification.', variant: 'destructive' });
-    }
-  };
-
-  const statusText = permission === 'granted' ? 'Enabled' : permission === 'denied' ? 'Blocked' : 'Not Set';
-  const statusVariant = permission === 'granted' ? 'default' : permission === 'denied' ? 'destructive' : 'secondary';
-
   return (
     <div className="max-w-2xl mx-auto bg-[hsl(var(--color-background))] min-h-screen">
-      <div className="px-6 py-4" style={{ borderBottom: '1px solid hsl(var(--color-border))' }}>
+      <div className="border-b border-[hsl(var(--color-border))] px-6 py-4">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={onBack}>
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-5 w-5 text-[hsl(var(--color-foreground))]" />
           </Button>
           <h1 className="text-xl font-semibold text-[hsl(var(--color-foreground))]">Notifications</h1>
         </div>
       </div>
       <div className="p-6 space-y-6">
-        <Card style={{ border: '1px solid hsl(var(--color-border))' }}>
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-base text-[hsl(var(--color-foreground))]">Browser Notifications</CardTitle>
-              <Badge variant={statusVariant}>{statusText}</Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {!isSupported ? (
-              <p className="text-sm text-[hsl(var(--color-muted-foreground))]">Your browser doesn't support push notifications.</p>
-            ) : permission === 'granted' ? (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="push-enabled" className="text-sm text-[hsl(var(--color-foreground))]">Enable push notifications</Label>
-                  <Switch
-                    id="push-enabled"
-                    checked={settings.pushNotifications}
-                    onCheckedChange={(checked) => {
-                      if (checked) handleEnablePush(); else handleDisablePush();
-                    }}
-                  />
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleTest}
-                  className="w-full"
-                  style={{ border: '1px solid hsl(var(--color-border))' }}
-                >
-                  Send Test Notification
-                </Button>
-              </div>
-            ) : (
-              <Button
-                onClick={handleEnablePush}
-                className="w-full bg-[hsl(var(--color-primary))] text-[hsl(var(--color-primary-foreground))] hover:bg-[hsl(var(--color-primary)_/_0.9)]"
-              >
-                Enable Browser Notifications
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card style={{ border: '1px solid hsl(var(--color-border))' }}>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base text-[hsl(var(--color-foreground))]">Notification Types</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="writing-reminders" className="text-sm text-[hsl(var(--color-foreground))]">Writing reminders</Label>
-              <Switch id="writing-reminders" checked={settings.writingReminders} onCheckedChange={(checked) => saveSettings({ ...settings, writingReminders: checked })} />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="like-notifications" className="text-sm text-[hsl(var(--color-foreground))]">Like notifications</Label>
-              <Switch id="like-notifications" checked={settings.likeNotifications} onCheckedChange={(checked) => saveSettings({ ...settings, likeNotifications: checked })} />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="achievement-notifications" className="text-sm text-[hsl(var(--color-foreground))]">Achievement notifications</Label>
-              <Switch id="achievement-notifications" checked={settings.achievementNotifications} onCheckedChange={(checked) => saveSettings({ ...settings, achievementNotifications: checked })} />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="system-notifications" className="text-sm text-[hsl(var(--color-foreground))]">System notifications</Label>
-              <Switch id="system-notifications" checked={settings.systemNotifications} onCheckedChange={(checked) => saveSettings({ ...settings, systemNotifications: checked })} />
-            </div>
-          </CardContent>
-        </Card>
-
+        <NotificationSettingsInline />
         <div className="pt-2">
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => toast({ title: 'Preferences saved' })}
-            style={{ border: '1px solid hsl(var(--color-border))' }}
-          >
+          <Button variant="outline" className="w-full" onClick={() => toast({ title: 'Preferences saved' })}>
             Save Changes
           </Button>
         </div>
@@ -731,16 +574,16 @@ const JournalSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   return (
     <div className="max-w-2xl mx-auto bg-[hsl(var(--color-background))] min-h-screen">
-      <div className="px-6 py-4" style={{ borderBottom: '1px solid hsl(var(--color-border))' }}>
+      <div className="border-b border-[hsl(var(--color-border))] px-6 py-4">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={onBack}>
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-5 w-5 text-[hsl(var(--color-foreground))]" />
           </Button>
           <h1 className="text-xl font-semibold text-[hsl(var(--color-foreground))]">Journal Preferences</h1>
         </div>
       </div>
       <div className="p-6 space-y-6">
-        <Card style={{ border: '1px solid hsl(var(--color-border))' }}>
+        <Card className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))]">
           <CardHeader>
             <CardTitle className="text-[hsl(var(--color-foreground))]">Default Settings</CardTitle>
           </CardHeader>
@@ -762,8 +605,7 @@ const JournalSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 id="defaultMood"
                 value={settings.defaultMood}
                 onChange={(e) => saveSettings({ ...settings, defaultMood: e.target.value })}
-                className="w-full mt-2 px-3 py-2 rounded-md bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))]"
-                style={{ border: '1px solid hsl(var(--color-border))' }}
+                className="w-full mt-2 px-3 py-2 border border-[hsl(var(--color-border))] rounded-md bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))]"
               >
                 <option value="great">Great</option>
                 <option value="good">Good</option>
@@ -775,7 +617,7 @@ const JournalSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           </CardContent>
         </Card>
 
-        <Card style={{ border: '1px solid hsl(var(--color-border))' }}>
+        <Card className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))]">
           <CardHeader>
             <CardTitle className="text-[hsl(var(--color-foreground))]">Writing Experience</CardTitle>
           </CardHeader>
@@ -819,8 +661,7 @@ const JournalSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 id="fontSize"
                 value={settings.fontSize}
                 onChange={(e) => saveSettings({ ...settings, fontSize: e.target.value })}
-                className="w-full mt-2 px-3 py-2 rounded-md bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))]"
-                style={{ border: '1px solid hsl(var(--color-border))' }}
+                className="w-full mt-2 px-3 py-2 border border-[hsl(var(--color-border))] rounded-md bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))]"
               >
                 <option value="small">Small</option>
                 <option value="medium">Medium</option>
@@ -835,8 +676,7 @@ const JournalSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 id="lineSpacing"
                 value={settings.lineSpacing}
                 onChange={(e) => saveSettings({ ...settings, lineSpacing: e.target.value })}
-                className="w-full mt-2 px-3 py-2 rounded-md bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))]"
-                style={{ border: '1px solid hsl(var(--color-border))' }}
+                className="w-full mt-2 px-3 py-2 border border-[hsl(var(--color-border))] rounded-md bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))]"
               >
                 <option value="compact">Compact</option>
                 <option value="normal">Normal</option>
@@ -846,7 +686,7 @@ const JournalSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           </CardContent>
         </Card>
 
-        <Card style={{ border: '1px solid hsl(var(--color-border))' }}>
+        <Card className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))]">
           <CardHeader>
             <CardTitle className="text-[hsl(var(--color-foreground))]">Writing Goals & Reminders</CardTitle>
           </CardHeader>
@@ -870,8 +710,7 @@ const JournalSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                   type="time"
                   value={settings.reminderTime}
                   onChange={(e) => saveSettings({ ...settings, reminderTime: e.target.value })}
-                  className="mt-2 bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))]"
-                  style={{ border: '1px solid hsl(var(--color-border))' }}
+                  className="mt-2 bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))] border-[hsl(var(--color-border))]"
                 />
               </div>
             )}
@@ -886,8 +725,7 @@ const JournalSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 max="7"
                 value={settings.weeklyGoal}
                 onChange={(e) => saveSettings({ ...settings, weeklyGoal: parseInt(e.target.value) || 1 })}
-                className="bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))]"
-                style={{ border: '1px solid hsl(var(--color-border))' }}
+                className="bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))] border-[hsl(var(--color-border))]"
               />
             </div>
           </CardContent>
@@ -934,16 +772,16 @@ const DisplaySettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   return (
     <div className="max-w-2xl mx-auto bg-[hsl(var(--color-background))] min-h-screen">
-      <div className="px-6 py-4" style={{ borderBottom: '1px solid hsl(var(--color-border))' }}>
+      <div className="border-b border-[hsl(var(--color-border))] px-6 py-4">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={onBack}>
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-5 w-5 text-[hsl(var(--color-foreground))]" />
           </Button>
           <h1 className="text-xl font-semibold text-[hsl(var(--color-foreground))]">Display & Accessibility</h1>
         </div>
       </div>
       <div className="p-6 space-y-6">
-        <Card style={{ border: '1px solid hsl(var(--color-border))' }}>
+        <Card className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))]">
           <CardHeader>
             <CardTitle className="text-[hsl(var(--color-foreground))]">Theme</CardTitle>
           </CardHeader>
@@ -954,8 +792,7 @@ const DisplaySettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 id="themeMode"
                 value={settings.themeMode}
                 onChange={(e) => { const mode = e.target.value; save({ ...settings, themeMode: mode }); setTheme(mode as any); }}
-                className="w-full mt-2 px-3 py-2 rounded-md bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))]"
-                style={{ border: '1px solid hsl(var(--color-border))' }}
+                className="w-full mt-2 px-3 py-2 border border-[hsl(var(--color-border))] rounded-md bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))]"
               >
                 <option value="system">System</option>
                 <option value="light">Light</option>
@@ -965,7 +802,7 @@ const DisplaySettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           </CardContent>
         </Card>
 
-        <Card style={{ border: '1px solid hsl(var(--color-border))' }}>
+        <Card className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))]">
           <CardHeader>
             <CardTitle className="text-[hsl(var(--color-foreground))]">Readability</CardTitle>
           </CardHeader>
@@ -976,8 +813,7 @@ const DisplaySettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 id="fontScale"
                 value={settings.fontScale}
                 onChange={(e) => save({ ...settings, fontScale: e.target.value })}
-                className="w-full mt-2 px-3 py-2 rounded-md bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))]"
-                style={{ border: '1px solid hsl(var(--color-border))' }}
+                className="w-full mt-2 px-3 py-2 border border-[hsl(var(--color-border))] rounded-md bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))]"
               >
                 <option value="small">Small</option>
                 <option value="medium">Medium</option>
@@ -1002,7 +838,7 @@ const DisplaySettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           </CardContent>
         </Card>
 
-        <Card style={{ border: '1px solid hsl(var(--color-border))' }}>
+        <Card className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))]">
           <CardHeader>
             <CardTitle className="text-[hsl(var(--color-foreground))]">Theme Customization</CardTitle>
           </CardHeader>
@@ -1066,41 +902,39 @@ const AccountSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   return (
     <div className="max-w-2xl mx-auto bg-[hsl(var(--color-background))] min-h-screen">
-      <div className="px-6 py-4" style={{ borderBottom: '1px solid hsl(var(--color-border))' }}>
+      <div className="border-b border-[hsl(var(--color-border))] px-6 py-4">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={onBack}>
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-5 w-5 text-[hsl(var(--color-foreground))]" />
           </Button>
           <h1 className="text-xl font-semibold text-[hsl(var(--color-foreground))]">Account</h1>
         </div>
       </div>
       <div className="p-6 space-y-6">
-        <Card style={{ border: '1px solid hsl(var(--color-border))' }}>
+        <Card className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))]">
           <CardHeader>
             <CardTitle className="text-[hsl(var(--color-foreground))]">Change Password</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="new-password" className="text-[hsl(var(--color-foreground))] font-medium">New password</Label>
+              <Label htmlFor="new-password" className="text-[hsl(var(--color-foreground))]">New password</Label>
               <Input
                 id="new-password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))]"
-                style={{ border: '1px solid hsl(var(--color-border))' }}
+                className="bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))] border-[hsl(var(--color-border))]"
               />
               <p className="text-xs text-[hsl(var(--color-muted-foreground))] mt-1">Minimum 8 characters.</p>
             </div>
             <div>
-              <Label htmlFor="confirm-password" className="text-[hsl(var(--color-foreground))] font-medium">Confirm password</Label>
+              <Label htmlFor="confirm-password" className="text-[hsl(var(--color-foreground))]">Confirm password</Label>
               <Input
                 id="confirm-password"
                 type="password"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
-                className="bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))]"
-                style={{ border: '1px solid hsl(var(--color-border))' }}
+                className="bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))] border-[hsl(var(--color-border))]"
               />
             </div>
             <Button
@@ -1113,7 +947,7 @@ const AccountSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           </CardContent>
         </Card>
 
-        <Card style={{ border: '1px solid hsl(var(--color-border))' }}>
+        <Card className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))]">
           <CardHeader>
             <CardTitle className="text-[hsl(var(--color-foreground))]">Export Your Data</CardTitle>
           </CardHeader>
@@ -1124,26 +958,20 @@ const AccountSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               onClick={handleExportData}
               disabled={loading}
               className="w-full"
-              style={{ border: '1px solid hsl(var(--color-border))' }}
             >
               <Download className="h-4 w-4 mr-2" /> Download Journal Data (JSON)
             </Button>
           </CardContent>
         </Card>
 
-        <Card style={{ border: '1px solid hsl(var(--color-border))' }}>
+        <Card className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))]">
           <CardHeader>
             <CardTitle className="text-[hsl(var(--color-foreground))]">Danger Zone</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-sm text-[hsl(var(--color-muted-foreground))]">To delete your account and data, please contact support. We'll handle your request promptly.</p>
             <a href="mailto:support@luma.app?subject=Account%20Deletion%20Request" className="w-full">
-              <Button
-                variant="destructive"
-                className="w-full bg-[hsl(var(--color-destructive))] text-[hsl(var(--color-destructive-foreground))] hover:bg-[hsl(var(--color-destructive)_/_0.9)]"
-              >
-                Request Account Deletion
-              </Button>
+              <Button variant="destructive" className="w-full">Request Account Deletion</Button>
             </a>
           </CardContent>
         </Card>
@@ -1154,45 +982,28 @@ const AccountSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
 const HelpSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => (
   <div className="max-w-2xl mx-auto bg-[hsl(var(--color-background))] min-h-screen">
-    <div className="px-6 py-4" style={{ borderBottom: '1px solid hsl(var(--color-border))' }}>
+    <div className="border-b border-[hsl(var(--color-border))] px-6 py-4">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" onClick={onBack}>
-          <ArrowLeft className="h-5 w-5" />
+          <ArrowLeft className="h-5 w-5 text-[hsl(var(--color-foreground))]" />
         </Button>
         <h1 className="text-xl font-semibold text-[hsl(var(--color-foreground))]">Help & Support</h1>
       </div>
     </div>
     <div className="p-6 space-y-6">
-      <Card style={{ border: '1px solid hsl(var(--color-border))' }}>
+      <Card className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))]">
         <CardHeader>
           <CardTitle className="text-[hsl(var(--color-foreground))]">Resources</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-sm text-[hsl(var(--color-muted-foreground))]">Find guides and tips to get the most out of Luma.</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <a href="/community" className="w-full">
-              <Button
-                variant="outline"
-                className="w-full"
-                style={{ border: '1px solid hsl(var(--color-border))' }}
-              >
-                Visit Community
-              </Button>
-            </a>
-            <a href="https://docs.lovable.dev/" target="_blank" rel="noreferrer" className="w-full">
-              <Button
-                variant="outline"
-                className="w-full"
-                style={{ border: '1px solid hsl(var(--color-border))' }}
-              >
-                Read Documentation
-              </Button>
-            </a>
+            <a href="https://docs.lovable.dev/" target="_blank" rel="noreferrer" className="w-full"><Button variant="outline" className="w-full">Read Documentation</Button></a>
           </div>
         </CardContent>
       </Card>
 
-      <Card style={{ border: '1px solid hsl(var(--color-border))' }}>
+      <Card className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))]">
         <CardHeader>
           <CardTitle className="text-[hsl(var(--color-foreground))]">Contact</CardTitle>
         </CardHeader>
@@ -1200,21 +1011,9 @@ const HelpSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => (
           <p className="text-sm text-[hsl(var(--color-muted-foreground))]">Need help? We're here for you.</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <a href="mailto:support@luma.app?subject=Support%20Request" className="w-full">
-              <Button
-                className="w-full bg-[hsl(var(--color-primary))] text-[hsl(var(--color-primary-foreground))] hover:bg-[hsl(var(--color-primary)_/_0.9)]"
-              >
-                Contact Support
-              </Button>
+              <Button className="w-full bg-[hsl(var(--color-primary))] text-[hsl(var(--color-primary-foreground))] hover:bg-[hsl(var(--color-primary)_/_0.9)]">Contact Support</Button>
             </a>
-            <a href="mailto:support@luma.app?subject=Bug%20Report" className="w-full">
-              <Button
-                variant="outline"
-                className="w-full"
-                style={{ border: '1px solid hsl(var(--color-border))' }}
-              >
-                Report a Bug
-              </Button>
-            </a>
+            <a href="mailto:support@luma.app?subject=Bug%20Report" className="w-full"><Button variant="outline" className="w-full">Report a Bug</Button></a>
           </div>
         </CardContent>
       </Card>
@@ -1224,16 +1023,16 @@ const HelpSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => (
 
 const AboutSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => (
   <div className="max-w-2xl mx-auto bg-[hsl(var(--color-background))] min-h-screen">
-    <div className="px-6 py-4" style={{ borderBottom: '1px solid hsl(var(--color-border))' }}>
+    <div className="border-b border-[hsl(var(--color-border))] px-6 py-4">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" onClick={onBack}>
-          <ArrowLeft className="h-5 w-5" />
+          <ArrowLeft className="h-5 w-5 text-[hsl(var(--color-foreground))]" />
         </Button>
         <h1 className="text-xl font-semibold text-[hsl(var(--color-foreground))]">About</h1>
       </div>
     </div>
     <div className="p-6">
-      <Card style={{ border: '1px solid hsl(var(--color-border))' }}>
+      <Card className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))]">
         <CardHeader>
           <CardTitle className="text-[hsl(var(--color-foreground))]">Luma Journal</CardTitle>
         </CardHeader>
@@ -1245,5 +1044,4 @@ const AboutSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => (
     </div>
   </div>
 );
-
 export default SettingsPage;

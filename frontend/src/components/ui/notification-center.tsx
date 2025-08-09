@@ -62,9 +62,10 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
 }) => {
   return (
     <div
-      className={`p-3 border-b border-[hsl(var(--color-border))] last:border-b-0 transition-colors ${
+      className={`p-3 last:border-b-0 transition-colors ${
         !notification.read ? 'bg-[hsl(var(--color-primary)_/_0.05)]' : 'hover:bg-[hsl(var(--color-muted)_/_0.5)]'
       }`}
+      style={{ borderBottom: '1px solid hsl(var(--color-border))' }}
     >
       <div className="flex items-start gap-3">
         <div className="text-lg flex-shrink-0 mt-0.5">
@@ -87,20 +88,31 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 flex-shrink-0 text-[hsl(var(--color-foreground))] hover:bg-[hsl(var(--color-accent))]"
+                >
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent
+                align="end"
+                className="bg-[hsl(var(--color-background))]"
+                style={{ border: '1px solid hsl(var(--color-border))' }}
+              >
                 {!notification.read && (
-                  <DropdownMenuItem onClick={() => onMarkAsRead(notification.id)}>
+                  <DropdownMenuItem
+                    onClick={() => onMarkAsRead(notification.id)}
+                    className="text-[hsl(var(--color-foreground))] hover:bg-[hsl(var(--color-accent))]"
+                  >
                     <Check className="h-4 w-4 mr-2" />
                     Mark as read
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem
                   onClick={() => onDelete(notification.id)}
-                  className="text-[hsl(var(--color-destructive))]"
+                  className="text-[hsl(var(--color-destructive))] hover:bg-[hsl(var(--color-destructive)_/_0.1)]"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
                   Delete
@@ -146,10 +158,14 @@ export function NotificationCenter() {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative text-[hsl(var(--color-foreground))] hover:bg-[hsl(var(--color-accent))]"
+        >
           <Bell className="h-4 w-4" />
           {unreadCount > 0 && (
-            <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center">
+            <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center bg-[hsl(var(--color-primary))] text-[hsl(var(--color-primary-foreground))]">
               {unreadCount > 99 ? '99+' : unreadCount}
             </Badge>
           )}
@@ -159,24 +175,28 @@ export function NotificationCenter() {
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className="w-80 p-0" align="end">
-        <Card className="border-0 shadow-none">
+      <PopoverContent
+        className="w-80 p-0 bg-[hsl(var(--color-background))]"
+        align="end"
+        style={{ border: '1px solid hsl(var(--color-border))' }}
+      >
+        <Card className="border-0 shadow-none bg-[hsl(var(--color-background))]">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">Notifications</CardTitle>
+              <CardTitle className="text-lg text-[hsl(var(--color-foreground))]">Notifications</CardTitle>
               {unreadCount > 0 && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleMarkAllAsRead}
-                  className="text-xs"
+                  className="text-xs text-[hsl(var(--color-foreground))] hover:bg-[hsl(var(--color-accent))]"
                 >
                   Mark all read
                 </Button>
               )}
             </div>
             {unreadCount > 0 && (
-              <CardDescription>
+              <CardDescription className="text-[hsl(var(--color-muted-foreground))]">
                 You have {unreadCount} unread notification{unreadCount !== 1 ? 's' : ''}
               </CardDescription>
             )}
@@ -194,7 +214,8 @@ export function NotificationCenter() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="mt-3"
+                  className="mt-3 text-[hsl(var(--color-foreground))] hover:bg-[hsl(var(--color-accent))]"
+                  style={{ border: '1px solid hsl(var(--color-border))' }}
                   onClick={createTestNotification}
                 >
                   Create Test Notification
