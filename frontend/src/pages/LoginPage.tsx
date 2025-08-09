@@ -1,204 +1,158 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { supabase } from "../supabaseClient";
+import React, { useState } from 'react';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Alert, AlertDescription } from '../components/ui/alert';
+import { Heart, Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-export default function LoginPage() {
+const LoginPage = () => {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+    email: '',
+    password: ''
   });
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  // Test function to create a user (for debugging)
-  const testCreateUser = async () => {
-    const testEmail = "test@example.com";
-    const testPassword = "testpassword123";
-
-    console.log("Creating test user...");
-    const { data, error } = await supabase.auth.signUp({
-      email: testEmail,
-      password: testPassword,
-    });
-
-    if (error) {
-      console.error("Test signup failed:", error);
-    } else {
-      console.log("Test user created successfully:", data);
-      alert(`Test user created with email: ${testEmail}`);
-    }
-  };
-
-  // Test Supabase connection
-  const testConnection = async () => {
-    console.log("Testing Supabase connection...");
-    try {
-      const { data, error } = await supabase.auth.getSession();
-      console.log("Session test result:", { data, error });
-
-      // Test a simple query that doesn't require admin
-      const { data: userData, error: userError } =
-        await supabase.auth.getUser();
-      console.log("Get user test:", { userData, userError });
-
-      alert("Connection test complete - check console for details");
-    } catch (err) {
-      console.error("Connection test failed:", err);
-    }
-  };
-
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setLoading(true);
+    setIsLoading(true);
+    setError('');
 
-    const { email, password } = formData;
-
+    // Simulate login - replace with actual auth logic
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim().toLowerCase(),
-        password,
-      });
-
-      console.log("=== LOGIN RESPONSE ===");
-      console.log("Data:", data);
-      console.log("Error:", error);
-
-      if (error) {
-        console.error("Login failed - Full error:", error);
-        console.error("Error message:", error.message);
-        console.error("Error status:", error.status);
-
-        // More specific error handling
-        if (error.message === "Invalid login credentials") {
-          setError(
-            "Email or password is incorrect. Please check your credentials."
-          );
-        } else if (error.message.includes("Email not confirmed")) {
-          setError(
-            "Please check your email and confirm your account before logging in."
-          );
-        } else {
-          setError(`Login failed: ${error.message}`);
-        }
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (formData.email && formData.password) {
+        navigate('/dashboard');
       } else {
-        console.log("Login successful! User:", data.user);
-        navigate("/dashboard");
+        setError('Please fill in all fields');
       }
     } catch (err) {
-      console.error("Unexpected error during login:", err);
-      setError("An unexpected error occurred. Please try again.");
+      setError('Login failed. Please try again.');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] font-['Inter']">
-      {/* Simple Header to match landing */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-4xl mx-auto px-6 py-6 text-center">
-          <div className="text-4xl font-['Playfair_Display'] font-bold text-[#A78BFA]">
-            Luma
+    <div className="min-h-screen flex items-center justify-center p-4"       style={{
+        backgroundImage: "linear-gradient(180deg, hsl(253, 31%, 99%) 0%, hsl(268, 100%, 98%) 100%)",
+      }}>
+      <div className="w-full max-w-md">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-healing flex items-center justify-center">
+              <Heart className="h-5 w-5 text-primary-foreground" />
+            </div>
+            <span className="text-2xl font-bold bg-gradient-to-r from-primary to-healing bg-clip-text text-transparent">
+              Luma
+            </span>
           </div>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Welcome back</h1>
+          <p className="text-muted-foreground">Sign in to continue your journey</p>
         </div>
-      </header>
 
-      <div className="flex items-center justify-center px-6 py-16">
-        <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-md">
-          <h2 className="font-['Playfair_Display'] text-3xl font-semibold text-[#1F2937] mb-2 text-center">
-            Welcome Back
-          </h2>
-          <p className="text-[#6B7280] text-center mb-6">
-            Log in to your journal
-          </p>
+        {/* Login Form */}
+        <Card className="shadow-[var(--shadow-warm)] border-border/50 bg-card/80 backdrop-blur">
+          <CardHeader>
+            <CardTitle className="text-center text-foreground">Sign In</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {error && (
+                <Alert className="border-destructive/50 text-destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
 
-          <form onSubmit={handleLogin} className="space-y-4">
-            {/* Display error message if present */}
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
-                {error}
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-foreground">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your@email.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                    className="pl-10 border-border/50 focus:ring-primary/20 focus:border-primary"
+                    required
+                  />
+                </div>
               </div>
-            )}
 
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-[#1F2937] text-sm font-medium mb-1"
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-foreground">Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Enter your password"
+                    value={formData.password}
+                    onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                    className="pl-10 pr-10 border-border/50 focus:ring-primary/20 focus:border-primary"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() => navigate('/forgot-password')}
+                  className="text-sm text-primary hover:text-primary/80 transition-colors"
+                >
+                  Forgot password?
+                </button>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-primary to-healing hover:from-primary/90 hover:to-healing/90 text-primary-foreground shadow-[var(--shadow-gentle)] transition-[var(--transition-gentle)]"
+                disabled={isLoading}
               >
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Email"
-                required
-                disabled={loading}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#A78BFA] focus:border-transparent disabled:bg-gray-100"
-              />
+                {isLoading ? 'Signing in...' : 'Sign In'}
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                Don't have an account?{' '}
+                <button
+                  onClick={() => navigate('/signup')}
+                  className="text-primary hover:text-primary/80 transition-colors font-medium"
+                >
+                  Sign up
+                </button>
+              </p>
             </div>
+          </CardContent>
+        </Card>
 
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-[#1F2937] text-sm font-medium mb-1"
-              >
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Password"
-                required
-                disabled={loading}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#A78BFA] focus:border-transparent disabled:bg-gray-100"
-              />
-            </div>
-
-            <div className="text-right text-sm">
-              <Link
-                to="/forgot-password"
-                className="text-[#A78BFA] hover:underline"
-              >
-                Forgot password?
-              </Link>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-[#A78BFA] hover:bg-[#93C5FD] text-white py-3 px-4 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-            >
-              {loading ? "Logging in..." : "Log In"}
-            </button>
-          </form>
-
-          <p className="mt-6 text-sm text-center text-[#6B7280]">
-            Don't have an account?{" "}
-            <Link to="/signup" className="text-[#A78BFA] hover:underline">
-              Sign Up
-            </Link>
-          </p>
-
-          <p className="mt-2 text-sm text-center text-[#6B7280]">
-            <Link to="/" className="hover:underline text-[#6B7280]">
-              ← Back to Luma
-            </Link>
-          </p>
+        {/* Back to landing */}
+        <div className="text-center mt-6">
+          <button
+            onClick={() => navigate('/')}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            ← Back to home
+          </button>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default LoginPage;

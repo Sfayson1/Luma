@@ -1,152 +1,150 @@
-import React, { useState } from "react";
-import { supabase } from "../supabaseClient";
+import React, { useState } from 'react';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Alert, AlertDescription } from '../components/ui/alert';
+import { Heart, Mail, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const ForgotPasswordPage: React.FC = () => {
-  const [email, setEmail] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
-  const [isSubmitted, setIsSubmitted] = useState(false);
+const ForgotPasswordPage = () => {
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError("");
+    setError('');
 
+    // Simulate password reset email
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
-
-      if (error) {
-        setError(error.message);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (email) {
+        setEmailSent(true);
       } else {
-        setIsSubmitted(true);
+        setError('Please enter your email address');
       }
     } catch (err) {
-      setError("An unexpected error occurred. Please try again.");
+      setError('Failed to send reset email. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleBackToLogin = () => {
-    navigate("/login");
-  };
+  if (emailSent) {
+    return (
+      <div className="min-h-screen bg-[linear-gradient(to_bottom_right,hsl(var(--color-background)),hsl(var(--color-gentle)),hsl(var(--color-serenity)_/_0.2))] flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <Card className="shadow-[var(--shadow-warm)] border-[hsl(var(--color-border)_/_0.5)] bg-[hsl(var(--color-card)_/_0.8)] backdrop-blur text-center">
+            <CardHeader>
+              <div className="flex justify-center mb-4">
+                <div className="h-16 w-16 rounded-full bg-[linear-gradient(to_bottom_right,hsl(var(--color-primary)),hsl(var(--color-healing)))] flex items-center justify-center">
+                  <Mail className="h-8 w-8 text-[hsl(var(--color-primary-foreground))]" />
+                </div>
+              </div>
+              <CardTitle className="text-[hsl(var(--color-foreground))]">Check your email</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-[hsl(var(--color-muted-foreground))]">
+                We've sent password reset instructions to{' '}
+                <span className="font-medium text-[hsl(var(--color-foreground))]">{email}</span>
+              </p>
+              <p className="text-sm text-[hsl(var(--color-muted-foreground))]">
+                Didn't receive the email? Check your spam folder or try again.
+              </p>
+              <div className="space-y-3">
+                <Button
+                  onClick={() => setEmailSent(false)}
+                  variant="outline"
+                  className="w-full border-[hsl(var(--color-primary)_/_0.2)] text-[hsl(var(--color-primary))] hover:bg-[hsl(var(--color-primary)_/_0.05)]"
+                >
+                  Send again
+                </Button>
+                <Button
+                  onClick={() => navigate('/login')}
+                  className="w-full bg-[linear-gradient(to_right,hsl(var(--color-primary)),hsl(var(--color-healing)))] hover:bg-[linear-gradient(to_right,hsl(var(--color-primary)_/_0.9),hsl(var(--color-healing)_/_0.9))] text-[hsl(var(--color-primary-foreground))]"
+                >
+                  Back to sign in
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+    <div className="min-h-screen bg-[linear-gradient(to_bottom_right,hsl(var(--color-background)),hsl(var(--color-gentle)),hsl(var(--color-serenity)_/_0.2))] flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1
-            className="text-4xl font-light text-gray-800 mb-2"
-            style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
-          >
-            Forgot <span className="text-purple-400">Password</span>
-          </h1>
-          <p className="text-gray-600 font-light">
-            Enter your email and we'll send you a reset link
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <div className="h-10 w-10 rounded-full bg-[linear-gradient(to_bottom_right,hsl(var(--color-primary)),hsl(var(--color-healing)))] flex items-center justify-center">
+              <Heart className="h-5 w-5 text-[hsl(var(--color-primary-foreground))]" />
+            </div>
+            <span className="text-2xl font-bold bg-[linear-gradient(to_right,hsl(var(--color-primary)),hsl(var(--color-healing)))] bg-clip-text text-transparent">
+              Luma
+            </span>
+          </div>
+          <h1 className="text-2xl font-bold text-[hsl(var(--color-foreground))] mb-2">Reset your password</h1>
+          <p className="text-[hsl(var(--color-muted-foreground))]">
+            Enter your email address and we'll send you a link to reset your password
           </p>
         </div>
 
-        {!isSubmitted ? (
-          <div className="space-y-6">
-            {/* Email Input */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Email Address
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition-all duration-200"
-                placeholder="Enter your email"
-                disabled={isLoading}
-              />
-            </div>
-
-            {/* Error Message */}
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-2xl p-4">
-                <p className="text-red-600 text-sm font-light">{error}</p>
-              </div>
-            )}
-
-            {/* Submit Button */}
-            <button
-              onClick={handleSubmit}
-              disabled={isLoading}
-              className="w-full bg-purple-400 text-white py-3 px-4 rounded-2xl font-light hover:bg-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-100 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <div className="flex items-center justify-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Sending...
-                </div>
-              ) : (
-                "Send Reset Link"
+        {/* Reset Form */}
+        <Card className="shadow-[var(--shadow-warm)] border-[hsl(var(--color-border)_/_0.5)] bg-[hsl(var(--color-card)_/_0.8)] backdrop-blur">
+          <CardHeader>
+            <CardTitle className="text-center text-[hsl(var(--color-foreground))]">Forgot Password</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {error && (
+                <Alert className="border-[hsl(var(--color-destructive)_/_0.5)] text-[hsl(var(--color-destructive))]">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
               )}
-            </button>
-          </div>
-        ) : (
-          /* Success State */
-          <div className="text-center space-y-6">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-              <span className="text-2xl">📧</span>
-            </div>
-            <div>
-              <h3 className="text-xl font-medium text-gray-800 mb-2">
-                Check Your Email
-              </h3>
-              <p className="text-gray-600 font-light leading-relaxed">
-                We've sent a password reset link to <strong>{email}</strong>.
-                Click the link in the email to reset your password.
-              </p>
-            </div>
-            <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4">
-              <p className="text-blue-800 text-sm font-light">
-                <strong>Didn't receive the email?</strong> Check your spam
-                folder or try again in a few minutes.
-              </p>
-            </div>
-          </div>
-        )}
 
-        {/* Back to Login */}
-        <div className="mt-8 text-center">
-          <button
-            onClick={handleBackToLogin}
-            className="text-purple-400 hover:text-purple-500 text-sm font-light transition-colors"
-          >
-            ← Back to Login
-          </button>
-        </div>
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-[hsl(var(--color-foreground))]">Email address</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-[hsl(var(--color-muted-foreground))]" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-10 border-[hsl(var(--color-border)_/_0.5)] focus:ring-[hsl(var(--color-primary)_/_0.2)] focus:border-[hsl(var(--color-primary))]"
+                    required
+                  />
+                </div>
+              </div>
 
-        {/* Resend Option */}
-        {isSubmitted && (
-          <div className="mt-4 text-center">
-            <button
-              onClick={() => {
-                setIsSubmitted(false);
-                setEmail("");
-                setMessage("");
-                setError("");
-              }}
-              className="text-gray-500 hover:text-gray-700 text-sm font-light transition-colors"
-            >
-              Try a different email
-            </button>
-          </div>
-        )}
+              <Button
+                type="submit"
+                className="w-full bg-[linear-gradient(to_right,hsl(var(--color-primary)),hsl(var(--color-healing)))] hover:bg-[linear-gradient(to_right,hsl(var(--color-primary)_/_0.9),hsl(var(--color-healing)_/_0.9))] text-[hsl(var(--color-primary-foreground))] shadow-[var(--shadow-gentle)] transition-[var(--transition-gentle)]"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Sending...' : 'Send reset instructions'}
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <button
+                onClick={() => navigate('/login')}
+                className="inline-flex items-center gap-2 text-sm text-[hsl(var(--color-muted-foreground))] hover:text-[hsl(var(--color-foreground))] transition-colors"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to sign in
+              </button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

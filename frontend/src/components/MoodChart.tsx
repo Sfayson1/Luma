@@ -58,9 +58,9 @@ const MoodChart: React.FC<MoodChartProps> = ({ moodData }) => {
 
   if (!moodData || moodData.length === 0) {
     return (
-      <div className="bg-white p-6 rounded-lg shadow-lg">
-        <h3 className="text-xl font-semibold text-gray-800 mb-4">Mood Trends</h3>
-        <div className="text-center py-8 text-gray-500">
+      <div className="bg-[hsl(var(--color-card))] p-6 rounded-lg shadow-[var(--shadow-gentle)]" >
+        <h3 className="text-xl font-semibold text-[hsl(var(--color-foreground))] mb-4">Mood Trends</h3>
+        <div className="text-center py-8 text-[hsl(var(--color-muted-foreground))]">
           No mood data available yet. Start journaling to see your mood trends!
         </div>
       </div>
@@ -68,30 +68,30 @@ const MoodChart: React.FC<MoodChartProps> = ({ moodData }) => {
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
-      <h3 className="text-xl font-semibold text-gray-800 mb-4">Mood Trends Over Time</h3>
+    <div className="bg-[hsl(var(--color-card))] p-6 rounded-lg shadow-[var(--shadow-gentle)]" >
+      <h3 className="text-xl font-semibold text-[hsl(var(--color-foreground))] mb-4">Mood Trends Over Time</h3>
 
       <div className="h-80 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--color-border))" />
             <XAxis
               dataKey="date"
               tickFormatter={formatDate}
-              stroke="#64748b"
+              stroke="hsl(var(--color-muted-foreground))"
               fontSize={12}
             />
             <YAxis
-              stroke="#64748b"
+              stroke="hsl(var(--color-muted-foreground))"
               fontSize={12}
             />
             <Tooltip
               labelFormatter={(value) => `Date: ${formatDate(value as string)}`}
               contentStyle={{
-                backgroundColor: '#ffffff',
-                border: '1px solid #e2e8f0',
+                backgroundColor: 'hsl(var(--color-background))',
+                border: '1px solid hsl(var(--color-border))',
                 borderRadius: '8px',
-                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                boxShadow: 'var(--shadow-gentle)'
               }}
             />
             <Legend />
@@ -101,10 +101,10 @@ const MoodChart: React.FC<MoodChartProps> = ({ moodData }) => {
                 key={mood}
                 type="monotone"
                 dataKey={mood}
-                stroke={moodColors[mood] || '#64748b'}
+                stroke={moodColors[mood] || 'hsl(var(--color-muted-foreground))'}
                 strokeWidth={3}
-                dot={{ fill: moodColors[mood] || '#64748b', strokeWidth: 2, r: 4 }}
-                activeDot={{ r: 6, stroke: moodColors[mood] || '#64748b', strokeWidth: 2 }}
+                dot={{ fill: moodColors[mood] || 'hsl(var(--color-muted-foreground))', strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6, stroke: moodColors[mood] || 'hsl(var(--color-muted-foreground))', strokeWidth: 2 }}
               />
             ))}
           </LineChart>
@@ -112,8 +112,8 @@ const MoodChart: React.FC<MoodChartProps> = ({ moodData }) => {
       </div>
 
       {/* Mood distribution summary */}
-      <div className="mt-6 pt-4 border-t border-gray-200">
-        <h4 className="text-lg font-medium text-gray-700 mb-3">Mood Distribution</h4>
+      <div className="mt-6 pt-4 border-[hsl(var(--color-border))]">
+        <h4 className="text-lg font-medium text-[hsl(var(--color-foreground))] mb-3">Mood Distribution</h4>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {moods.map((mood) => {
             const totalCount = moodData
@@ -127,12 +127,12 @@ const MoodChart: React.FC<MoodChartProps> = ({ moodData }) => {
               <div key={mood} className="text-center">
                 <div
                   className="w-4 h-4 rounded-full mx-auto mb-1"
-                  style={{ backgroundColor: moodColors[mood] || '#64748b' }}
+                  style={{ backgroundColor: moodColors[mood] || 'hsl(var(--color-muted-foreground))' }}
                 />
-                <div className="text-sm font-medium text-gray-700 capitalize">
+                <div className="text-sm font-medium text-[hsl(var(--color-foreground))] capitalize">
                   {mood}
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-[hsl(var(--color-muted-foreground))]">
                   {totalCount} entries ({percentage}%)
                 </div>
               </div>

@@ -110,47 +110,47 @@ const WritingStreak: React.FC<WritingStreakProps> = ({ entryDates }) => {
   const frequency = getWritingFrequency();
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
-      <h3 className="text-xl font-semibold text-gray-800 mb-6">Writing Activity</h3>
+    <div className="bg-[hsl(var(--color-card))] p-6 rounded-lg shadow-[var(--shadow-gentle)]">
+      <h3 className="text-xl font-semibold text-[hsl(var(--color-foreground))] mb-6">Writing Activity</h3>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="text-center p-4 bg-blue-50 rounded-lg">
-          <div className="text-2xl font-bold text-blue-600">
+        <div className="text-center p-4 bg-[hsl(200_80%_95%)] rounded-lg">
+          <div className="text-2xl font-bold text-[hsl(200_80%_40%)]">
             {streaks.current}
           </div>
-          <div className="text-sm text-blue-700">Current Streak</div>
-          <div className="text-xs text-blue-500 mt-1">
+          <div className="text-sm text-[hsl(200_80%_30%)]">Current Streak</div>
+          <div className="text-xs text-[hsl(200_80%_50%)] mt-1">
             {streaks.current === 1 ? 'day' : 'days'}
           </div>
         </div>
 
-        <div className="text-center p-4 bg-green-50 rounded-lg">
-          <div className="text-2xl font-bold text-green-600">
+        <div className="text-center p-4 bg-[hsl(142_69%_95%)] rounded-lg">
+          <div className="text-2xl font-bold text-[hsl(142_69%_40%)]">
             {streaks.longest}
           </div>
-          <div className="text-sm text-green-700">Longest Streak</div>
-          <div className="text-xs text-green-500 mt-1">
+          <div className="text-sm text-[hsl(142_69%_30%)]">Longest Streak</div>
+          <div className="text-xs text-[hsl(142_69%_50%)] mt-1">
             {streaks.longest === 1 ? 'day' : 'days'}
           </div>
         </div>
 
-        <div className="text-center p-4 bg-purple-50 rounded-lg">
-          <div className="text-2xl font-bold text-purple-600">
+        <div className="text-center p-4 bg-[hsl(var(--color-healing)_/_0.1)] rounded-lg">
+          <div className="text-2xl font-bold text-[hsl(var(--color-healing))]">
             {totalEntries}
           </div>
-          <div className="text-sm text-purple-700">Total Entries</div>
-          <div className="text-xs text-purple-500 mt-1">
+          <div className="text-sm text-[hsl(var(--color-healing)_/_0.8)]">Total Entries</div>
+          <div className="text-xs text-[hsl(var(--color-healing)_/_0.7)] mt-1">
             {totalEntries === 1 ? 'entry' : 'entries'}
           </div>
         </div>
 
-        <div className="text-center p-4 bg-orange-50 rounded-lg">
-          <div className="text-2xl font-bold text-orange-600">
+        <div className="text-center p-4 bg-[hsl(25_95%_94%)] rounded-lg">
+          <div className="text-2xl font-bold text-[hsl(25_95%_40%)]">
             {frequency}%
           </div>
-          <div className="text-sm text-orange-700">Frequency</div>
-          <div className="text-xs text-orange-500 mt-1">
+          <div className="text-sm text-[hsl(25_95%_30%)]">Frequency</div>
+          <div className="text-xs text-[hsl(25_95%_50%)] mt-1">
             daily writing rate
           </div>
         </div>
@@ -158,7 +158,7 @@ const WritingStreak: React.FC<WritingStreakProps> = ({ entryDates }) => {
 
       {/* Activity Heatmap */}
       <div>
-        <h4 className="text-lg font-medium text-gray-700 mb-3">
+        <h4 className="text-lg font-medium text-[hsl(var(--color-foreground))] mb-3">
           Last 90 Days Activity
         </h4>
 
@@ -168,7 +168,7 @@ const WritingStreak: React.FC<WritingStreakProps> = ({ entryDates }) => {
             <div className="flex mb-1">
               <div className="w-8"></div>
               {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
-                <div key={i} className="w-3 h-3 text-xs text-gray-400 flex items-center justify-center mx-0.5">
+                <div key={i} className="w-3 h-3 text-xs text-[hsl(var(--color-muted-foreground))] flex items-center justify-center mx-0.5">
                   {day}
                 </div>
               ))}
@@ -186,7 +186,7 @@ const WritingStreak: React.FC<WritingStreakProps> = ({ entryDates }) => {
                   const isFirstOfMonth = date.getDate() <= 7;
 
                   return (
-                    <div key={weekIndex} className="w-6 h-3 text-xs text-gray-400 flex items-center">
+                    <div key={weekIndex} className="w-6 h-3 text-xs text-[hsl(var(--color-muted-foreground))] flex items-center">
                       {isFirstOfMonth ? date.toLocaleDateString('en-US', { month: 'short' }) : ''}
                     </div>
                   );
@@ -200,8 +200,8 @@ const WritingStreak: React.FC<WritingStreakProps> = ({ entryDates }) => {
                     key={index}
                     className={`w-3 h-3 rounded-sm ${
                       day.hasEntry
-                        ? 'bg-green-500 hover:bg-green-600'
-                        : 'bg-gray-100 hover:bg-gray-200'
+                        ? 'bg-[hsl(142_69%_58%)] hover:bg-[hsl(142_69%_48%)]'
+                        : 'bg-[hsl(var(--color-muted))] hover:bg-[hsl(var(--color-muted)_/_0.8)]'
                     } transition-colors cursor-pointer`}
                     title={`${day.date}${day.hasEntry ? ' - Entry written' : ' - No entry'}`}
                   />
@@ -212,36 +212,36 @@ const WritingStreak: React.FC<WritingStreakProps> = ({ entryDates }) => {
         </div>
 
         {/* Legend */}
-        <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
+        <div className="flex items-center justify-between mt-3 text-xs text-[hsl(var(--color-muted-foreground))]">
           <span>Less</span>
           <div className="flex items-center space-x-1">
-            <div className="w-3 h-3 bg-gray-100 rounded-sm"></div>
-            <div className="w-3 h-3 bg-green-200 rounded-sm"></div>
-            <div className="w-3 h-3 bg-green-400 rounded-sm"></div>
-            <div className="w-3 h-3 bg-green-500 rounded-sm"></div>
-            <div className="w-3 h-3 bg-green-600 rounded-sm"></div>
+            <div className="w-3 h-3 bg-[hsl(var(--color-muted))] rounded-sm"></div>
+            <div className="w-3 h-3 bg-[hsl(142_69%_80%)] rounded-sm"></div>
+            <div className="w-3 h-3 bg-[hsl(142_69%_68%)] rounded-sm"></div>
+            <div className="w-3 h-3 bg-[hsl(142_69%_58%)] rounded-sm"></div>
+            <div className="w-3 h-3 bg-[hsl(142_69%_48%)] rounded-sm"></div>
           </div>
           <span>More</span>
         </div>
       </div>
 
       {/* Motivational message */}
-      <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
+      <div className="mt-6 p-4 bg-[linear-gradient(to_right,hsl(var(--color-serenity)_/_0.3),hsl(var(--color-primary)_/_0.1))] rounded-lg border border-[hsl(var(--color-primary)_/_0.2)]">
         <div className="text-center">
           {streaks.current === 0 ? (
-            <p className="text-blue-700">
+            <p className="text-[hsl(var(--color-primary))]">
               💪 Ready to start a new writing streak? Your next entry counts!
             </p>
           ) : streaks.current < 3 ? (
-            <p className="text-blue-700">
+            <p className="text-[hsl(var(--color-primary))]">
               🌱 Great start! Keep building your writing habit - you're on day {streaks.current}!
             </p>
           ) : streaks.current < 7 ? (
-            <p className="text-blue-700">
+            <p className="text-[hsl(var(--color-primary))]">
               🔥 You're on fire! {streaks.current} days strong - the habit is forming!
             </p>
           ) : (
-            <p className="text-blue-700">
+            <p className="text-[hsl(var(--color-primary))]">
               🏆 Amazing! {streaks.current} days of consistent journaling - you're a writing champion!
             </p>
           )}

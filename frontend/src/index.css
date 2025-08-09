@@ -1,55 +1,106 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@700&display=swap');
+/* @import "tailwindcss/preflight"; */
 @import "tailwindcss";
 
 :root {
-  background-color: #F9FAFB;
+  /* Light mode colors */
+  --color-background: 253 31% 99%;
+  --color-foreground: 240 10% 20%;
+  --color-card: 255 100% 100%;
+  --color-card-foreground: 240 10% 20%;
+  --color-popover: 255 100% 100%;
+  --color-popover-foreground: 240 10% 20%;
+  --color-primary: 262 62% 67%;
+  --color-primary-foreground: 255 100% 100%;
+  --color-secondary: 253 25% 96%;
+  --color-secondary-foreground: 240 10% 30%;
+  --color-muted: 248 20% 94%;
+  --color-muted-foreground: 240 5% 64%;
+  --color-accent: 268 100% 94%;
+  --color-accent-foreground: 262 62% 67%;
+  --color-destructive: 0 84% 60%;
+  --color-destructive-foreground: 255 100% 100%;
+  --color-border: 248 15% 88%;
+  --color-input: 248 15% 88%;
+  --color-ring: 262 62% 67%;
+  --color-healing: 268 56% 85%;
+  --color-serenity: 200 50% 94%;
+  --color-warmth: 25 40% 96%;
+  --color-gentle: 268 100% 98%;
+
+  /* Typography tokens */
+  --font-playfair: "Playfair Display", serif;
+  --font-cormorant: "Cormorant Garamond", serif;
+  --font-inter: "Inter", sans-serif;
+
+  /* Gradients */
+  --gradient-healing: linear-gradient(135deg, hsl(var(--color-primary)) 0%, hsl(var(--color-healing)) 100%);
+  --gradient-calm: linear-gradient(180deg, hsl(var(--color-background)) 0%, hsl(var(--color-gentle)) 100%);
+  --gradient-warmth: linear-gradient(135deg, hsl(var(--color-serenity)) 0%, hsl(var(--color-warmth)) 100%);
+
+  /* Shadows */
+  --shadow-gentle: 0 4px 20px -4px hsl(var(--color-primary) / 0.1);
+  --shadow-warm: 0 8px 30px -8px hsl(var(--color-primary) / 0.15);
+
+  /* Radius */
+  --radius: 0.5rem;
+
+  /* Sidebar tokens */
+  --color-sidebar-background: 0 0% 98%;
+  --color-sidebar-foreground: 240 5.3% 26.1%;
+  --color-sidebar-primary: 240 5.9% 10%;
+  --color-sidebar-primary-foreground: 0 0% 98%;
+  --color-sidebar-accent: 240 4.8% 95.9%;
+  --color-sidebar-accent-foreground: 240 5.9% 10%;
+  --color-sidebar-border: 220 13% 91%;
+  --color-sidebar-ring: 217.2 91.2% 59.8%;
 }
 
-body {
-  font-family: 'Inter', sans-serif;
+.dark {
+  /* Dark mode overrides */
+  --color-background: 240 10% 3.9%;
+  --color-foreground: 0 0% 98%;
+  --color-card: 240 10% 3.9%;
+  --color-card-foreground: 0 0% 98%;
+  --color-popover: 240 10% 3.9%;
+  --color-popover-foreground: 0 0% 98%;
+  --color-primary: 262 83% 58%;
+  --color-primary-foreground: 0 0% 98%;
+  --color-secondary: 240 3.7% 15.9%;
+  --color-secondary-foreground: 0 0% 98%;
+  --color-muted: 240 3.7% 15.9%;
+  --color-muted-foreground: 240 5% 64.9%;
+  --color-accent: 240 3.7% 15.9%;
+  --color-accent-foreground: 0 0% 98%;
+  --color-destructive: 0 62.8% 30.6%;
+  --color-destructive-foreground: 0 0% 98%;
+  --color-border: 240 3.7% 15.9%;
+  --color-input: 240 3.7% 15.9%;
+  --color-ring: 262 83% 58%;
+  --color-healing: 268 56% 60%;
+  --color-serenity: 200, 61%, 82%;
+  --color-warmth: 25 40% 25%;
+  --color-gentle: 268 100% 8%;
+  --gradient-healing: linear-gradient(135deg, hsl(var(--color-primary)) 0%, hsl(var(--color-healing)) 100%);
+  --gradient-calm: linear-gradient(180deg, hsl(var(--color-background)) 0%, hsl(var(--color-gentle)) 100%);
+  --gradient-warmth: linear-gradient(135deg, hsl(var(--color-serenity)) 0%, hsl(var(--color-warmth)) 100%);
+  --shadow-gentle: 0 4px 20px -4px hsl(0 0% 0% / 0.3);
+  --shadow-warm: 0 8px 30px -8px hsl(0 0% 0% / 0.4);
+  --color-sidebar-background: 240 5.9% 10%;
+  --color-sidebar-foreground: 240 4.8% 95.9%;
+  --color-sidebar-primary: 262 83% 58%;
+  --color-sidebar-primary-foreground: 0 0% 100%;
+  --color-sidebar-accent: 240 3.7% 15.9%;
+  --color-sidebar-accent-foreground: 240 4.8% 95.9%;
+  --color-sidebar-border: 240 3.7% 15.9%;
+  --color-sidebar-ring: 262 83% 58%;
 }
 
-/* Any other CSS rules go here */
-
-
-
-/* 🌿 Base Styles */
-:root {
-  background-color: #F9FAFB; /* Soft background */
-  color: #1F2937; /* Slate 800 (main text) */
-  font-family: 'Inter', sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+html, body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-inter);
 }
 
-/* ⛔ Remove outdated dark mode root styles */
-
-/* 🔗 Link Styling */
-a {
-  font-weight: 500;
-  color: #A78BFA; /* Soft Lavender */
-  text-decoration: none;
-}
-a:hover {
-  color: #8B5CF6; /* Slightly deeper lavender */
-}
-
-/* 🧹 Body Reset */
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  background-color: #F9FAFB;
-  color: #1F2937;
-}
-
-/* 🖋️ Headings */
-h1, h2, h3 {
-  font-family: 'Playfair Display', serif;
-  color: #1F2937;
+* {
+  border-color: var(--color-border);
 }

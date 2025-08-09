@@ -1,201 +1,194 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { supabase } from "../supabaseClient";
+import React, { useState } from 'react';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Alert, AlertDescription } from '../components/ui/alert';
+import { Heart, Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-export default function SignUpPage() {
+const SignUpPage = () => {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
-    username: "",
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
   });
-
-  const [error, setError] = useState("");
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setIsLoading(true);
+    setError('');
 
-    const { email, password, username, firstName, lastName } = formData;
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      setIsLoading(false);
+      return;
+    }
 
+    // Simulate signup - replace with actual auth logic
     try {
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            username,
-            firstName,
-            lastName,
-          },
-        },
-      });
-
-      if (signUpError) {
-        setError(signUpError.message);
-        return;
-      }
-
-if (data?.user) {
-  const { error: profileError } = await supabase
-    .from("profiles")  // Change from "users" to "profiles"
-    .insert([
-      {
-        id: data.user.id,
-        username: username,
-        first_name: firstName,
-        last_name: lastName,
-      },
-    ]);
-
-  if (profileError) {
-    console.error("Profile creation failed:", profileError);
-    setError("Account created but profile setup failed. Please contact support.");
-    return;
-  }
-
-        navigate("/login");
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (formData.name && formData.email && formData.password) {
+        navigate('/dashboard');
       } else {
-        setError("Signup succeeded but user data is missing.");
+        setError('Please fill in all fields');
       }
     } catch (err) {
-      console.error(err);
-      setError("Something went wrong. Please try again.");
+      setError('Signup failed. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
- return (
-    <div className="min-h-screen bg-[#F9FAFB] font-['Inter']">
-      {/* Simple Header to match landing */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-4xl mx-auto px-6 py-6 text-center">
-          <div className="text-4xl font-['Playfair_Display'] font-bold text-[#A78BFA]">
-            Luma
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-gentle to-serenity/20 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-healing flex items-center justify-center">
+              <Heart className="h-5 w-5 text-primary-foreground" />
+            </div>
+            <span className="text-2xl font-bold bg-gradient-to-r from-primary to-healing bg-clip-text text-transparent">
+              Luma
+            </span>
           </div>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Join Luma</h1>
+          <p className="text-muted-foreground">Create your mental wellness account</p>
         </div>
-      </header>
 
-      <div className="flex items-center justify-center px-6 py-16">
-        <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-md">
-          <h2 className="font-['Playfair_Display'] text-3xl font-semibold text-[#1F2937] mb-2 text-center">
-            Create Your Account
-          </h2>
-          <p className="text-[#6B7280] text-center mb-6">
-            Join Luma and start journaling today
-          </p>
+        {/* Signup Form */}
+        <Card className="shadow-[var(--shadow-warm)] border-border/50 bg-card/80 backdrop-blur">
+          <CardHeader>
+            <CardTitle className="text-center text-foreground">Create Account</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {error && (
+                <Alert className="border-destructive/50 text-destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Username */}
-            <div>
-              <label className="block text-[#1F2937] text-sm font-medium mb-1">
-                Username
-              </label>
-              <input
-                type="text"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                placeholder="Username"
-                required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#A78BFA] focus:border-transparent"
-              />
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-foreground">Full Name</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Your full name"
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    className="pl-10 border-border/50 focus:ring-primary/20 focus:border-primary"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-foreground">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your@email.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                    className="pl-10 border-border/50 focus:ring-primary/20 focus:border-primary"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-foreground">Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Create a password"
+                    value={formData.password}
+                    onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                    className="pl-10 pr-10 border-border/50 focus:ring-primary/20 focus:border-primary"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword" className="text-foreground">Confirm Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    placeholder="Confirm your password"
+                    value={formData.confirmPassword}
+                    onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                    className="pl-10 pr-10 border-border/50 focus:ring-primary/20 focus:border-primary"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-primary to-healing hover:from-primary/90 hover:to-healing/90 text-primary-foreground shadow-[var(--shadow-gentle)] transition-[var(--transition-gentle)]"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Creating account...' : 'Create Account'}
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                Already have an account?{' '}
+                <button
+                  onClick={() => navigate('/login')}
+                  className="text-primary hover:text-primary/80 transition-colors font-medium"
+                >
+                  Sign in
+                </button>
+              </p>
             </div>
+          </CardContent>
+        </Card>
 
-            {/* First Name */}
-            <div>
-              <label className="block text-[#1F2937] text-sm font-medium mb-1">
-                First Name
-              </label>
-              <input
-                type="text"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                placeholder="First Name"
-                required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#A78BFA] focus:border-transparent"
-              />
-            </div>
-
-            {/* Last Name */}
-            <div>
-              <label className="block text-[#1F2937] text-sm font-medium mb-1">
-                Last Name
-              </label>
-              <input
-                type="text"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                placeholder="Last Name"
-                required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#A78BFA] focus:border-transparent"
-              />
-            </div>
-
-            {/* Email */}
-            <div>
-              <label className="block text-[#1F2937] text-sm font-medium mb-1">
-                Email
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Email"
-                required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#A78BFA] focus:border-transparent"
-              />
-            </div>
-
-            {/* Password */}
-            <div>
-              <label className="block text-[#1F2937] text-sm font-medium mb-1">
-                Password
-              </label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Password"
-                required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#A78BFA] focus:border-transparent"
-              />
-            </div>
-
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-
-            <button
-              type="submit"
-              className="w-full bg-[#A78BFA] hover:bg-[#93C5FD] text-white py-3 px-4 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1"
-            >
-              Create Account
-            </button>
-          </form>
-
-          <p className="mt-6 text-sm text-center text-[#6B7280]">
-            Already have an account?{" "}
-            <Link to="/login" className="text-[#A78BFA] hover:underline">
-              Log in
-            </Link>
-          </p>
-
-          <p className="mt-2 text-sm text-center text-[#6B7280]">
-            By creating an account, you agree to our{' '}
-            <Link to="/terms" className="hover:underline text-[#6B7280]">
-              Terms of Service
-            </Link>
-          </p>
+        {/* Back to landing */}
+        <div className="text-center mt-6">
+          <button
+            onClick={() => navigate('/')}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            ← Back to home
+          </button>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default SignUpPage;
