@@ -16,12 +16,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/components/ui/theme-provider';
 import { NotificationSettingsInline } from '@/components/ui/notification-settings-inline';
+import { UserGuide } from '@/components/ui/user-guide';
 
 interface SettingsPageProps {
   onBack?: () => void;
 }
 
- const SettingsPage: React.FC<SettingsPageProps> = ({ onBack }) => {
+const SettingsPage: React.FC<SettingsPageProps> = ({ onBack }) => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const [currentPage, setCurrentPage] = useState('menu');
@@ -980,46 +981,66 @@ const AccountSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   );
 };
 
-const HelpSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => (
-  <div className="max-w-2xl mx-auto bg-[hsl(var(--color-background))] min-h-screen">
-    <div className="border-b border-[hsl(var(--color-border))] px-6 py-4">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={onBack}>
-          <ArrowLeft className="h-5 w-5 text-[hsl(var(--color-foreground))]" />
-        </Button>
-        <h1 className="text-xl font-semibold text-[hsl(var(--color-foreground))]">Help & Support</h1>
+const HelpSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+  const [showDocs, setShowDocs] = useState(false);
+
+  if (showDocs) {
+    return <UserGuide onBack={() => setShowDocs(false)} />;
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto bg-[hsl(var(--color-background))] min-h-screen">
+      <div className="border-b border-[hsl(var(--color-border))] px-6 py-4">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={onBack}>
+            <ArrowLeft className="h-5 w-5 text-[hsl(var(--color-foreground))]" />
+          </Button>
+          <h1 className="text-xl font-semibold text-[hsl(var(--color-foreground))]">Help & Support</h1>
+        </div>
+      </div>
+      <div className="p-6 space-y-6">
+        <Card className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))]">
+          <CardHeader>
+            <CardTitle className="text-[hsl(var(--color-foreground))]">Resources</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-[hsl(var(--color-muted-foreground))]">Find guides and tips to get the most out of Luma.</p>
+            <div className="grid grid-cols-1 gap-2">
+              <Button
+                variant="outline"
+                className="w-full justify-between"
+                onClick={() => setShowDocs(true)}
+              >
+                <span className="flex items-center gap-2">
+                  <BookOpen className="h-4 w-4" />
+                  Read User Guide
+                </span>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))]">
+          <CardHeader>
+            <CardTitle className="text-[hsl(var(--color-foreground))]">Contact</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-[hsl(var(--color-muted-foreground))]">Need help? We're here for you.</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <a href="mailto:support@luma.app?subject=Support%20Request" className="w-full">
+                <Button className="w-full bg-[hsl(var(--color-primary))] text-[hsl(var(--color-primary-foreground))] hover:bg-[hsl(var(--color-primary)_/_0.9)]">Contact Support</Button>
+              </a>
+              <a href="mailto:support@luma.app?subject=Bug%20Report" className="w-full">
+                <Button variant="outline" className="w-full">Report a Bug</Button>
+              </a>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
-    <div className="p-6 space-y-6">
-      <Card className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))]">
-        <CardHeader>
-          <CardTitle className="text-[hsl(var(--color-foreground))]">Resources</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <p className="text-sm text-[hsl(var(--color-muted-foreground))]">Find guides and tips to get the most out of Luma.</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <a href="https://docs.lovable.dev/" target="_blank" rel="noreferrer" className="w-full"><Button variant="outline" className="w-full">Read Documentation</Button></a>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))]">
-        <CardHeader>
-          <CardTitle className="text-[hsl(var(--color-foreground))]">Contact</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <p className="text-sm text-[hsl(var(--color-muted-foreground))]">Need help? We're here for you.</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <a href="mailto:support@luma.app?subject=Support%20Request" className="w-full">
-              <Button className="w-full bg-[hsl(var(--color-primary))] text-[hsl(var(--color-primary-foreground))] hover:bg-[hsl(var(--color-primary)_/_0.9)]">Contact Support</Button>
-            </a>
-            <a href="mailto:support@luma.app?subject=Bug%20Report" className="w-full"><Button variant="outline" className="w-full">Report a Bug</Button></a>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  </div>
-);
+  );
+};
 
 const AboutSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => (
   <div className="max-w-2xl mx-auto bg-[hsl(var(--color-background))] min-h-screen">
@@ -1044,4 +1065,5 @@ const AboutSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => (
     </div>
   </div>
 );
+
 export default SettingsPage;
