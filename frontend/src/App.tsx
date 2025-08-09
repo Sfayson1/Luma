@@ -8,14 +8,13 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./components/ui/theme-provider";
 import  Landing  from "./pages/Landing";
-// import { Journal } from "./pages/Journal";
 import  LoginPage  from "./pages/LoginPage";
 import  SignUpPage  from "./pages/SignUpPage";
 import  DashboardPage from './pages/ DashboardPage';
 import { CommunityFeed } from "./pages/CommunityFeed";
 import  ForgotPasswordPage  from "./pages/ForgotPasswordPage";
 import AuthPage from "./pages/AuthPage";
-// import NotFound from "./pages/NotFound";
+import NotFound from "./pages/NotFound";
 import ProfilePage from "./pages/ProfilePage";
 import  SettingsPage  from "./pages/SettingsPage";
 
@@ -37,7 +36,6 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Landing />} />
-            {/* <Route path="/journal" element={<Journal />} /> */}
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />
@@ -46,8 +44,7 @@ const App = () => {
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            {/* <Route path="*" element={<NotFound />} /> */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>

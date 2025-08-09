@@ -64,7 +64,7 @@ const ForgotPasswordPage = () => {
                   Send again
                 </Button>
                 <Button
-                  onClick={() => navigate('/login')}
+                  onClick={() => navigate('/auth')}
                   className="w-full bg-[linear-gradient(to_right,hsl(var(--color-primary)),hsl(var(--color-healing)))] hover:bg-[linear-gradient(to_right,hsl(var(--color-primary)_/_0.9),hsl(var(--color-healing)_/_0.9))] text-[hsl(var(--color-primary-foreground))]"
                 >
                   Back to sign in
@@ -136,7 +136,7 @@ const ForgotPasswordPage = () => {
 
             <div className="mt-6 text-center">
               <button
-                onClick={() => navigate('/login')}
+                onClick={() => navigate('/auth')}
                 className="inline-flex items-center gap-2 text-sm text-[hsl(var(--color-muted-foreground))] hover:text-[hsl(var(--color-foreground))] transition-colors"
               >
                 <ArrowLeft className="h-4 w-4" />

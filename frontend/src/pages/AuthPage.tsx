@@ -1,111 +1,137 @@
-import React, { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { Button } from '../components/ui/button'
-import { Input } from '../components/ui/input'
-import { Label } from '../components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
-import { useAuth } from '../context/AuthContext'
-import { useToast } from '../hooks/use-toast'
-import { Eye, EyeOff } from 'lucide-react'
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Heart, Mail, ArrowLeft } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../components/ui/tabs";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../hooks/use-toast";
+import { Eye, EyeOff } from "lucide-react";
 
 const AuthPage = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [name, setName] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const { signIn, signUp, user } = useAuth()
-  const { toast } = useToast()
-  const navigate = useNavigate()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { signIn, signUp, user } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (user) {
-      navigate('/dashboard')
+      navigate("/dashboard");
     }
-  }, [user, navigate])
+  }, [user, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!email || !password) {
       toast({
-        title: 'Error',
-        description: 'Please fill in all fields',
-        variant: 'destructive',
-      })
-      return
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
+      return;
     }
 
-    setIsLoading(true)
-    const { error } = await signIn(email, password)
+    setIsLoading(true);
+    const { error } = await signIn(email, password);
 
     if (error) {
       toast({
-        title: 'Sign In Failed',
-        description: error.message || 'Invalid email or password',
-        variant: 'destructive',
-      })
+        title: "Sign In Failed",
+        description: error.message || "Invalid email or password",
+        variant: "destructive",
+      });
     } else {
       toast({
-        title: 'Welcome back!',
-        description: 'You have successfully signed in.',
-      })
-      navigate('/dashboard')
+        title: "Welcome back!",
+        description: "You have successfully signed in.",
+      });
+      navigate("/dashboard");
     }
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  };
 
   const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!email || !password || !name) {
       toast({
-        title: 'Error',
-        description: 'Please fill in all fields',
-        variant: 'destructive',
-      })
-      return
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
+      return;
     }
 
     if (password.length < 6) {
       toast({
-        title: 'Error',
-        description: 'Password must be at least 6 characters long',
-        variant: 'destructive',
-      })
-      return
+        title: "Error",
+        description: "Password must be at least 6 characters long",
+        variant: "destructive",
+      });
+      return;
     }
 
-    setIsLoading(true)
-    const { error } = await signUp(email, password, name)
+    setIsLoading(true);
+    const { error } = await signUp(email, password, name);
 
     if (error) {
       toast({
-        title: 'Sign Up Failed',
-        description: error.message || 'Failed to create account',
-        variant: 'destructive',
-      })
+        title: "Sign Up Failed",
+        description: error.message || "Failed to create account",
+        variant: "destructive",
+      });
     } else {
       toast({
-        title: 'Account Created!',
-        description: 'Please check your email to verify your account.',
-      })
+        title: "Account Created!",
+        description: "Please check your email to verify your account.",
+      });
     }
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  };
 
   return (
-    <div className="min-h-screen bg-[linear-gradient(to_bottom_right,hsl(var(--color-primary)_/_0.1),hsl(var(--color-background)),hsl(var(--color-secondary)_/_0.1))] flex items-center justify-center p-4" style={{
-        backgroundImage: "linear-gradient(180deg, hsl(253, 31%, 99%) 0%, hsl(268, 100%, 98%) 100%)",
-      }}>
+    <div
+      className="min-h-screen bg-[linear-gradient(to_bottom_right,hsl(var(--color-primary)_/_0.1),hsl(var(--color-background)),hsl(var(--color-secondary)_/_0.1))] flex items-center justify-center p-4"
+      style={{
+        backgroundImage:
+          "linear-gradient(180deg, hsl(253, 31%, 99%) 0%, hsl(268, 100%, 98%) 100%)",
+      }}
+    >
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link to="/" className="text-4xl md:text-5xl font-bold text-[hsl(var(--color-primary))] hover:text-primary/80">
-            Luma
+          <Link
+            to="/"
+            className="text-4xl md:text-5xl font-bold text-[hsl(var(--color-primary))] hover:text-primary/80"
+          >
+            <div className="flex items-center justify-center gap-2">
+              <div className="h-10 w-10 rounded-full bg-[linear-gradient(to_bottom_right,hsl(var(--color-primary)),hsl(var(--color-healing)))] flex items-center justify-center">
+                <Heart className="h-5 w-5 text-[hsl(var(--color-primary-foreground))]" />
+              </div>
+              <span>Luma</span>
+            </div>
           </Link>
-          <p className="mt-2 text-base md:text-lg text-[hsl(var(--color-muted-foreground))] ">Your safe space for mental wellness</p>
+          <p className="mt-2 text-base md:text-lg text-[hsl(var(--color-muted-foreground))]">
+            Your safe space for mental wellness
+          </p>
         </div>
 
-        <Card className='shadow-[var(--shadow-gentle)]'>
+        <Card className="shadow-[var(--shadow-gentle)]">
           <CardHeader className="text-center">
             <CardTitle>Welcome</CardTitle>
             <CardDescription>
@@ -137,7 +163,7 @@ const AuthPage = () => {
                     <div className="relative">
                       <Input
                         id="signin-password"
-                        type={showPassword ? 'text' : 'password'}
+                        type={showPassword ? "text" : "password"}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Enter your password"
@@ -157,13 +183,17 @@ const AuthPage = () => {
                         )}
                       </Button>
                     </div>
+                    <div className="flex items-center justify-end">
+                      <Link
+                        to="/forgot-password"
+                        className="text-sm text-[hsl(var(--color-primary))] hover:text-[hsl(var(--color-primary)_/_0.8)]"
+                      >
+                        Forgot password?
+                      </Link>
+                    </div>
                   </div>
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Signing In...' : 'Sign In'}
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? "Signing In..." : "Sign In"}
                   </Button>
                 </form>
               </TabsContent>
@@ -197,7 +227,7 @@ const AuthPage = () => {
                     <div className="relative">
                       <Input
                         id="signup-password"
-                        type={showPassword ? 'text' : 'password'}
+                        type={showPassword ? "text" : "password"}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Create a password (min. 6 characters)"
@@ -219,30 +249,17 @@ const AuthPage = () => {
                       </Button>
                     </div>
                   </div>
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Creating Account...' : 'Create Account'}
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? "Creating Account..." : "Create Account"}
                   </Button>
                 </form>
               </TabsContent>
             </Tabs>
-
-            <div className="mt-6 text-center">
-              <Link
-                to="/"
-                className="text-sm text-[hsl(var(--color-muted-foreground))] hover:text-[hsl(var(--color-primary))]"
-              >
-                Back to Home
-              </Link>
-            </div>
           </CardContent>
         </Card>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AuthPage
+export default AuthPage;

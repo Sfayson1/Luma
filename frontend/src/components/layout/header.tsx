@@ -99,13 +99,13 @@ export const Header = () => {
                 variant="ghost"
                 size="sm"
                 className="hidden md:flex text-[hsl(var(--color-foreground))] hover:bg-[hsl(var(--color-accent))]"
-                onClick={() => navigate('/login')}
+                onClick={() => navigate('/auth')}
               >
                 Sign In
               </Button>
               <Button
                 size="sm"
-                onClick={() => navigate('/signup')}
+                onClick={() => navigate('/auth')}
                 className="bg-gradient-to-r from-[hsl(var(--color-primary))] to-[hsl(var(--color-healing))] hover:from-[hsl(var(--color-primary)_/_0.9)] hover:to-[hsl(var(--color-healing)_/_0.9)] text-[hsl(var(--color-primary-foreground))] shadow-[var(--shadow-gentle)]"
               >
                 Get Started
