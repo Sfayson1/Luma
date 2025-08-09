@@ -4,6 +4,11 @@
 
 ---
 
+🌐 [Live Demo] (www.lumajournal.com)
+
+
+---
+
 ### ✨ Features
 * 📓 **Daily Prompts** – A new reflective question every day to guide your thoughts.
 * 🎭 **Mood Tagging** – Tag your entries with expressive moods and emojis.
@@ -108,11 +113,6 @@ JWT_SECRET=your_jwt_secret
 # Frontend (.env)
 VITE_API_URL=http://localhost:8000
 ```
-
----
-
-🌐 Live Demo
-Coming soon via Vercel
 
 ---
 
