@@ -4,7 +4,7 @@
 
 ---
 
-🌐 [Live Demo](www.lumajournal.com)
+🌐 [Live Demo](https://www.lumajournal.com/))
 
 
 ---
