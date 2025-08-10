@@ -1,39 +1,63 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './card';
-import { Button } from './button';
-import { Input } from './input';
-import { Textarea } from './textarea';
-import { Switch } from './switch';
-import { Label } from './label';
-import { PenTool, Eye, EyeOff } from 'lucide-react';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from './select';
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "./card";
+import { Button } from "./button";
+import { Input } from "./input";
+import { Textarea } from "./textarea";
+import { Switch } from "./switch";
+import { Label } from "./label";
+import { PenTool, Eye, EyeOff } from "lucide-react";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "./select";
 
 interface CreateJournalProps {
-  onSubmit: (entry: { title: string; content: string; isPrivate: boolean; isAnonymous: boolean; mood: 'great' | 'good' | 'okay' | 'low' | 'difficult'; hashtags: string[] }) => void;
+  onSubmit: (entry: {
+    title: string;
+    content: string;
+    isPrivate: boolean;
+    isAnonymous: boolean;
+    mood: "great" | "good" | "okay" | "low" | "difficult";
+    hashtags: string[];
+  }) => void;
 }
 
 export const CreateJournal = ({ onSubmit }: CreateJournalProps) => {
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
-  const [mood, setMood] = useState<'great' | 'good' | 'okay' | 'low' | 'difficult'>('okay');
-  const [hashtagsInput, setHashtagsInput] = useState('');
+  const [mood, setMood] = useState<
+    "great" | "good" | "okay" | "low" | "difficult"
+  >("okay");
+  const [hashtagsInput, setHashtagsInput] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (title.trim() && content.trim()) {
-      const tags = Array.from(new Set(
-        hashtagsInput
-          .split(/[\s,]+/)
-          .map(t => t.trim())
-          .filter(Boolean)
-          .map(t => (t.startsWith('#') ? t : `#${t}`))
-      ));
-      onSubmit({ title: title.trim(), content: content.trim(), isPrivate, isAnonymous, mood, hashtags: tags });
-      setTitle('');
-      setContent('');
-      setHashtagsInput('');
+      const tags = Array.from(
+        new Set(
+          hashtagsInput
+            .split(/[\s,]+/)
+            .map((t) => t.trim())
+            .filter(Boolean)
+            .map((t) => (t.startsWith("#") ? t : `#${t}`))
+        )
+      );
+      onSubmit({
+        title: title.trim(),
+        content: content.trim(),
+        isPrivate,
+        isAnonymous,
+        mood,
+        hashtags: tags,
+      });
+      setTitle("");
+      setContent("");
+      setHashtagsInput("");
     }
   };
 
@@ -68,23 +92,58 @@ export const CreateJournal = ({ onSubmit }: CreateJournalProps) => {
           </div>
 
           <div className="p-3 bg-[hsl(var(--color-serenity)_/_0.5)] rounded-lg border border-[hsl(var(--color-border)_/_0.3)]">
-            <Label htmlFor="mood" className="text-sm font-medium mb-2 block">Mood</Label>
+            <Label htmlFor="mood" className="text-sm font-medium mb-2 block">
+              Mood
+            </Label>
             <Select value={mood} onValueChange={(v) => setMood(v as any)}>
-              <SelectTrigger id="mood">
+              <SelectTrigger
+                id="mood"
+                className="border-[hsl(var(--color-border)_/_0.5)] focus:ring-[hsl(var(--color-primary)_/_0.2)] focus:border-[hsl(var(--color-primary))] bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))]"
+              >
                 <SelectValue placeholder="Select your mood" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="great">Great</SelectItem>
-                <SelectItem value="good">Good</SelectItem>
-                <SelectItem value="okay">Okay</SelectItem>
-                <SelectItem value="low">Low</SelectItem>
-                <SelectItem value="difficult">Difficult</SelectItem>
+              <SelectContent className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))] text-[hsl(var(--color-foreground))] shadow-lg z-50">
+                <SelectItem
+                  value="great"
+                  className="hover:bg-[hsl(var(--color-serenity)_/_0.5)] focus:bg-[hsl(var(--color-serenity)_/_0.5)] text-[hsl(var(--color-foreground))]"
+                >
+                  Great
+                </SelectItem>
+                <SelectItem
+                  value="good"
+                  className="hover:bg-[hsl(var(--color-serenity)_/_0.5)] focus:bg-[hsl(var(--color-serenity)_/_0.5)] text-[hsl(var(--color-foreground))]"
+                >
+                  Good
+                </SelectItem>
+                <SelectItem
+                  value="okay"
+                  className="hover:bg-[hsl(var(--color-serenity)_/_0.5)] focus:bg-[hsl(var(--color-serenity)_/_0.5)] text-[hsl(var(--color-foreground))]"
+                >
+                  Okay
+                </SelectItem>
+                <SelectItem
+                  value="low"
+                  className="hover:bg-[hsl(var(--color-serenity)_/_0.5)] focus:bg-[hsl(var(--color-serenity)_/_0.5)] text-[hsl(var(--color-foreground))]"
+                >
+                  Low
+                </SelectItem>
+                <SelectItem
+                  value="difficult"
+                  className="hover:bg-[hsl(var(--color-serenity)_/_0.5)] focus:bg-[hsl(var(--color-serenity)_/_0.5)] text-[hsl(var(--color-foreground))]"
+                >
+                  Difficult
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="p-3 bg-[hsl(var(--color-serenity)_/_0.5)] rounded-lg border border-[hsl(var(--color-border)_/_0.3)]">
-            <Label htmlFor="hashtags" className="text-sm font-medium mb-2 block">Hashtags</Label>
+            <Label
+              htmlFor="hashtags"
+              className="text-sm font-medium mb-2 block"
+            >
+              Hashtags
+            </Label>
             <Input
               id="hashtags"
               placeholder="#gratitude, #selfcare"
@@ -92,7 +151,9 @@ export const CreateJournal = ({ onSubmit }: CreateJournalProps) => {
               onChange={(e) => setHashtagsInput(e.target.value)}
               className="border-[hsl(var(--color-border)_/_0.5)] focus:ring-[hsl(var(--color-primary)_/_0.2)] focus:border-[hsl(var(--color-primary))] transition-[var(--transition-gentle)]"
             />
-            <p className="text-xs text-[hsl(var(--color-muted-foreground))] mt-2">Separate with commas or spaces. We'll add the # automatically.</p>
+            <p className="text-xs text-[hsl(var(--color-muted-foreground))] mt-2">
+              Separate with commas or spaces. We'll add the # automatically.
+            </p>
           </div>
 
           <div className="flex items-center justify-between p-3 bg-[hsl(var(--color-serenity)_/_0.5)] rounded-lg border border-[hsl(var(--color-border)_/_0.3)]">
@@ -102,8 +163,13 @@ export const CreateJournal = ({ onSubmit }: CreateJournalProps) => {
               ) : (
                 <Eye className="h-4 w-4 text-[hsl(var(--color-muted-foreground))]" />
               )}
-              <Label htmlFor="privacy-toggle" className="text-sm font-medium cursor-pointer">
-                {isPrivate ? 'Private (only you can see this)' : 'Public (visible to community)'}
+              <Label
+                htmlFor="privacy-toggle"
+                className="text-sm font-medium cursor-pointer"
+              >
+                {isPrivate
+                  ? "Private (only you can see this)"
+                  : "Public (visible to community)"}
               </Label>
             </div>
             <Switch
@@ -115,7 +181,10 @@ export const CreateJournal = ({ onSubmit }: CreateJournalProps) => {
 
           <div className="flex items-center justify-between p-3 bg-[hsl(var(--color-serenity)_/_0.7)] rounded-lg border border-[hsl(var(--color-border)_/_0.3)]">
             <div className="flex items-center gap-2">
-              <Label htmlFor="anonymous-toggle" className="text-sm font-medium cursor-pointer">
+              <Label
+                htmlFor="anonymous-toggle"
+                className="text-sm font-medium cursor-pointer"
+              >
                 Post anonymously
               </Label>
               <span className="text-sm text-[hsl(var(--color-muted-foreground))]">
