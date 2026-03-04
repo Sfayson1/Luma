@@ -81,7 +81,6 @@ def register(user_data: UserRegister, db: Session = Depends(get_db)):
         first_name=first_name,
         last_name=last_name,
         email=user_data.email,
-        grad_class="",
         hashed_password=pwd_context.hash(user_data.password),
     )
     db.add(new_user)

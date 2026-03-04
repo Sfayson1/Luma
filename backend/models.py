@@ -15,7 +15,6 @@ class User(Base):
     first_name = Column(String)
     last_name = Column(String)
     email = Column(String, unique=True, index=True)
-    grad_class = Column(String, default="")
     hashed_password = Column(String)
     posts = relationship("Post", back_populates="owner")
 
