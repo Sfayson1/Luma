@@ -38,6 +38,6 @@ app.include_router(auth.router, prefix="/api/auth", tags=["Auth"])
 def test_token():
     return {"message": "CORS is working"}
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 def health():
     return {"status": "ok"}
