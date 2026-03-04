@@ -1,17 +1,14 @@
-import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../ui/button';
 import { Menu } from 'lucide-react';
 import { ThemeToggle } from '../ui/theme-toggle';
 import { ThemeCustomizer } from '../ui/theme-customizer';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
 
 export const Header = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const userName = user ? `${user.first_name} ${user.last_name}`.trim() || user.username : 'User';
 
   const getInitials = (name: string) => {
@@ -23,19 +20,6 @@ export const Header = () => {
       .toUpperCase()
       .slice(0, 2);
   };
-
-  useEffect(() => {
-    const id = user?.id;
-    if (!id) { setAvatarUrl(null); return; }
-    supabase
-      .from('profiles')
-      .select('avatar_url')
-      .eq('user_id', id)
-      .maybeSingle()
-      .then(({ data }) => {
-        setAvatarUrl(data?.avatar_url ?? null);
-      });
-  }, [user?.id]);
 
   return (
     <header
@@ -84,9 +68,6 @@ export const Header = () => {
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
             >
               <Avatar className="h-8 w-8">
-                {avatarUrl ? (
-                  <AvatarImage src={avatarUrl || undefined} alt={userName} />
-                ) : null}
                 <AvatarFallback className="bg-[hsl(var(--color-primary)_/_0.1)] text-[hsl(var(--color-primary))] text-xs">
                   {getInitials(userName)}
                 </AvatarFallback>
