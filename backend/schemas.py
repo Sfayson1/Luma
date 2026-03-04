@@ -34,7 +34,7 @@ class UserOut(BaseModel):
     first_name: str
     last_name: str
     email: str
-    grad_class: str
+    grad_class: Optional[str] = ""
 
     class Config:
         from_attributes = True
@@ -66,7 +66,7 @@ class PostOut(BaseModel):
     mood: Optional[str] = None
     privacy: str
     tags: Optional[str] = None
-    owner_id: str
+    owner_id: int
     prompt_id: Optional[int] = None
 
     class Config:
@@ -79,7 +79,7 @@ class PostOutWithUser(BaseModel):
     mood: Optional[str] = None
     privacy: str
     tags: Optional[str] = None
-    owner_id: str
+    owner_id: int
     prompt_id: Optional[int] = None
     owner: UserOut
     prompt: Optional[PromptOut] = None
