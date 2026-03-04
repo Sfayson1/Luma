@@ -7,7 +7,6 @@ export interface AppUser {
   first_name: string
   last_name: string
   email: string
-  grad_class: string
 }
 
 interface AuthContextType {
