@@ -25,7 +25,6 @@ class UserCreate(BaseModel):
     first_name: str
     last_name: str
     email: EmailStr
-    grad_class: str
     password: str
 
 class UserUpdate(BaseModel):
