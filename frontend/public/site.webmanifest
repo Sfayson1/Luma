@@ -1,0 +1,16 @@
+{
+  "name": "Luma",
+  "short_name": "Luma",
+  "description": "Your personal journaling companion",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#7c3aed",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
