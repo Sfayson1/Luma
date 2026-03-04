@@ -31,3 +31,7 @@ def on_startup():
 @app.get("/test-token")
 def test_token():
     return {"message": "CORS is working"}
+
+@app.get("/")
+def health():
+    return {"status": "ok"}
