@@ -1,8 +1,9 @@
-import { supabase } from '../supabaseClient';
+import { me } from "../lib/auth";
+import { apiFetch } from "../lib/api";
 
 // Types for analytics data
 export interface MoodDataPoint {
-  date: string;
+  date: string; // YYYY-MM-DD
   mood: string;
   count: number;
 }
@@ -10,7 +11,7 @@ export interface MoodDataPoint {
 export interface TagCount {
   name: string;
   count: number;
-  color: string;
+  color?: string; // optional now (FastAPI may not have it yet)
 }
 
 export interface AnalyticsData {
@@ -23,44 +24,84 @@ export interface AnalyticsData {
   averageEntriesPerWeek: number;
 }
 
+// Match your backend PostOutWithUser shape as best as possible
+// Adjust fields if your API differs.
+type PostFromApi = {
+  id: number;
+  content: string;
+  date_posted: string; // ISO string or YYYY-MM-DD
+  mood?: string | null;
+  privacy: string;
+  tags?: string | null; // currently a string in your schema
+  prompt_id?: number | null;
+  owner_id: string;
+};
+
+function toYYYYMMDD(dateValue: string): string {
+  // Handles ISO timestamps or YYYY-MM-DD
+  const d = new Date(dateValue);
+  if (!Number.isNaN(d.getTime())) return d.toISOString().split("T")[0];
+  // fallback if already YYYY-MM-DD
+  return dateValue.split("T")[0];
+}
+
+function parseTags(tags?: string | null): string[] {
+  if (!tags) return [];
+
+  // Common formats:
+  // "work, school, family"
+  // "#work #school"
+  // "work|school|family"
+  // '["work","school"]' (if you ever store JSON as string)
+  const trimmed = tags.trim();
+
+  // JSON string array case
+  if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+    try {
+      const arr = JSON.parse(trimmed);
+      if (Array.isArray(arr)) return arr.map(String).map(t => t.trim()).filter(Boolean);
+    } catch {
+      // fall through
+    }
+  }
+
+  // Hashtags -> split on whitespace
+  if (trimmed.includes("#")) {
+    return trimmed
+      .split(/\s+/)
+      .map(t => t.replace(/^#+/, "").trim())
+      .filter(Boolean);
+  }
+
+  // Pipe or comma separated
+  return trimmed
+    .split(/[,|]/g)
+    .map(t => t.trim())
+    .filter(Boolean);
+}
+
 export async function getAnalyticsData(): Promise<AnalyticsData> {
   try {
-    // Get current user
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
+    // Ensure user is authenticated (and token works)
+    await me();
 
-    // Fetch all user's posts with tags
-    const { data: posts, error: postsError } = await supabase
-      .from('posts')
-      .select(`
-        id,
-        mood,
-        date_posted,
-        post_tags(
-          tag:tags(name, color)
-        )
-      `)
-      .eq('owner_id', user.id)
-      .order('date_posted', { ascending: true });
+    // Fetch all posts visible to current user (your backend filters privacy)
+    const posts = await apiFetch<PostFromApi[]>("/api/posts/");
 
-    if (postsError) throw postsError;
+    // Mood over time
+    const moodOverTime = calculateMoodOverTime(posts);
 
-    // 1. Mood over time data
-    const moodOverTime = calculateMoodOverTime(posts || []);
+    // Entry dates
+    const entryDates = posts.map(p => toYYYYMMDD(p.date_posted));
 
-    // 2. Entry dates for streak calculation
-    const entryDates = (posts || []).map(post =>
-      new Date(post.date_posted).toISOString().split('T')[0]
-    );
+    // Tag counts
+    const tagCounts = calculateTagCounts(posts);
 
-    // 3. Tag counts
-    const tagCounts = calculateTagCounts(posts || []);
-
-    // 4. Additional stats
-    const totalEntries = posts?.length || 0;
+    // Additional stats
+    const totalEntries = posts.length;
     const streakData = calculateStreaks(entryDates);
 
-    // 5. Weekly average
+    // Weekly average
     const averageEntriesPerWeek = calculateWeeklyAverage(entryDates);
 
     return {
@@ -70,33 +111,28 @@ export async function getAnalyticsData(): Promise<AnalyticsData> {
       totalEntries,
       currentStreak: streakData.current,
       longestStreak: streakData.longest,
-      averageEntriesPerWeek
+      averageEntriesPerWeek,
     };
-
   } catch (error) {
-    console.error('Error fetching analytics data:', error);
+    console.error("Error fetching analytics data:", error);
     throw error;
   }
 }
 
 // Helper function to calculate mood trends over time
-function calculateMoodOverTime(posts: any[]): MoodDataPoint[] {
-  const moodByDate: { [key: string]: { [mood: string]: number } } = {};
+function calculateMoodOverTime(posts: PostFromApi[]): MoodDataPoint[] {
+  const moodByDate: Record<string, Record<string, number>> = {};
 
-  posts.forEach(post => {
+  posts.forEach((post) => {
     if (post.mood) {
-      const date = new Date(post.date_posted).toISOString().split('T')[0];
+      const date = toYYYYMMDD(post.date_posted);
 
-      if (!moodByDate[date]) {
-        moodByDate[date] = {};
-      }
-
+      if (!moodByDate[date]) moodByDate[date] = {};
       moodByDate[date][post.mood] = (moodByDate[date][post.mood] || 0) + 1;
     }
   });
 
   const result: MoodDataPoint[] = [];
-
   Object.entries(moodByDate).forEach(([date, moods]) => {
     Object.entries(moods).forEach(([mood, count]) => {
       result.push({ date, mood, count });
@@ -106,33 +142,20 @@ function calculateMoodOverTime(posts: any[]): MoodDataPoint[] {
   return result.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 }
 
-// Helper function to calculate tag usage
-function calculateTagCounts(posts: any[]): TagCount[] {
-  const tagMap: { [name: string]: { count: number; color: string } } = {};
+// Helper function to calculate tag usage (no colors unless your API provides them)
+function calculateTagCounts(posts: PostFromApi[]): TagCount[] {
+  const tagMap: Record<string, { count: number }> = {};
 
-  posts.forEach(post => {
-    if (post.post_tags) {
-      post.post_tags.forEach((postTag: any) => {
-        if (postTag.tag) {
-          const tagName = postTag.tag.name;
-          const tagColor = postTag.tag.color;
-
-          if (tagMap[tagName]) {
-            tagMap[tagName].count++;
-          } else {
-            tagMap[tagName] = { count: 1, color: tagColor };
-          }
-        }
-      });
-    }
+  posts.forEach((post) => {
+    const tags = parseTags(post.tags);
+    tags.forEach((tagName) => {
+      if (!tagMap[tagName]) tagMap[tagName] = { count: 0 };
+      tagMap[tagName].count++;
+    });
   });
 
   return Object.entries(tagMap)
-    .map(([name, data]) => ({
-      name,
-      count: data.count,
-      color: data.color
-    }))
+    .map(([name, data]) => ({ name, count: data.count }))
     .sort((a, b) => b.count - a.count);
 }
 
@@ -140,7 +163,6 @@ function calculateTagCounts(posts: any[]): TagCount[] {
 function calculateStreaks(entryDates: string[]): { current: number; longest: number } {
   if (entryDates.length === 0) return { current: 0, longest: 0 };
 
-  // Remove duplicates and sort
   const uniqueDates = [...new Set(entryDates)].sort();
 
   let currentStreak = 0;
@@ -151,7 +173,6 @@ function calculateStreaks(entryDates: string[]): { current: number; longest: num
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
 
-  // Calculate longest streak
   for (let i = 1; i < uniqueDates.length; i++) {
     const prevDate = new Date(uniqueDates[i - 1]);
     const currDate = new Date(uniqueDates[i]);
@@ -167,27 +188,20 @@ function calculateStreaks(entryDates: string[]): { current: number; longest: num
   }
   longestStreak = Math.max(longestStreak, tempStreak);
 
-  // Calculate current streak (working backwards from today)
-  const lastEntryDate = new Date(uniqueDates[uniqueDates.length - 1]);
-  const todayStr = today.toISOString().split('T')[0];
-  const yesterdayStr = yesterday.toISOString().split('T')[0];
+  const todayStr = today.toISOString().split("T")[0];
+  const yesterdayStr = yesterday.toISOString().split("T")[0];
   const lastEntryStr = uniqueDates[uniqueDates.length - 1];
 
   if (lastEntryStr === todayStr || lastEntryStr === yesterdayStr) {
     currentStreak = 1;
-
-    // Count backwards
     for (let i = uniqueDates.length - 2; i >= 0; i--) {
       const currDate = new Date(uniqueDates[i + 1]);
       const prevDate = new Date(uniqueDates[i]);
       const diffTime = currDate.getTime() - prevDate.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-      if (diffDays === 1) {
-        currentStreak++;
-      } else {
-        break;
-      }
+      if (diffDays === 1) currentStreak++;
+      else break;
     }
   }
 
@@ -198,7 +212,7 @@ function calculateStreaks(entryDates: string[]): { current: number; longest: num
 function calculateWeeklyAverage(entryDates: string[]): number {
   if (entryDates.length === 0) return 0;
 
-  const uniqueDates = [...new Set(entryDates)];
+  const uniqueDates = [...new Set(entryDates)].sort();
   const firstEntry = new Date(uniqueDates[0]);
   const lastEntry = new Date(uniqueDates[uniqueDates.length - 1]);
 
@@ -208,55 +222,40 @@ function calculateWeeklyAverage(entryDates: string[]): number {
   return Math.round((uniqueDates.length / diffWeeks) * 100) / 100;
 }
 
-// Additional utility functions for more specific analytics
+export async function getMoodDistribution(): Promise<
+  { mood: string; count: number; percentage: number }[]
+> {
+  await me();
+  const posts = await apiFetch<PostFromApi[]>("/api/posts/");
 
-export async function getMoodDistribution(): Promise<{ mood: string; count: number; percentage: number }[]> {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('User not authenticated');
+  const moodPosts = posts.filter(p => !!p.mood) as Array<PostFromApi & { mood: string }>;
+  const total = moodPosts.length;
 
-  const { data: posts, error } = await supabase
-    .from('posts')
-    .select('mood')
-    .eq('owner_id', user.id)
-    .not('mood', 'is', null);
-
-  if (error) throw error;
-
-  const moodCounts: { [mood: string]: number } = {};
-  const total = posts?.length || 0;
-
-  posts?.forEach(post => {
-    moodCounts[post.mood] = (moodCounts[post.mood] || 0) + 1;
+  const moodCounts: Record<string, number> = {};
+  moodPosts.forEach(p => {
+    moodCounts[p.mood!] = (moodCounts[p.mood!] || 0) + 1;
   });
 
   return Object.entries(moodCounts).map(([mood, count]) => ({
     mood,
     count,
-    percentage: Math.round((count / total) * 100)
+    percentage: total ? Math.round((count / total) * 100) : 0,
   }));
 }
 
 export async function getWritingPatternsByDay(): Promise<{ day: string; count: number }[]> {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('User not authenticated');
+  await me();
+  const posts = await apiFetch<PostFromApi[]>("/api/posts/");
 
-  const { data: posts, error } = await supabase
-    .from('posts')
-    .select('date_posted')
-    .eq('owner_id', user.id);
-
-  if (error) throw error;
-
-  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const dayCounts = new Array(7).fill(0);
 
-  posts?.forEach(post => {
-    const day = new Date(post.date_posted).getDay();
-    dayCounts[day]++;
+  posts.forEach(post => {
+    const d = new Date(post.date_posted);
+    if (!Number.isNaN(d.getTime())) {
+      dayCounts[d.getDay()]++;
+    }
   });
 
-  return dayNames.map((day, index) => ({
-    day,
-    count: dayCounts[index]
-  }));
+  return dayNames.map((day, index) => ({ day, count: dayCounts[index] }));
 }
