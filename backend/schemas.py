@@ -38,7 +38,6 @@ class UserOut(BaseModel):
     first_name: str
     last_name: str
     email: str
-    grad_class: Optional[str] = ""
 
     class Config:
         from_attributes = True
