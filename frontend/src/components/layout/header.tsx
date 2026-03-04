@@ -12,7 +12,7 @@ export const Header = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const userName = user?.user_metadata?.name || user?.email?.split('@')[0] || 'User';
+  const userName = user ? `${user.first_name} ${user.last_name}`.trim() || user.username : 'User';
 
   const getInitials = (name: string) => {
     return name

@@ -124,7 +124,7 @@ const dailyPrompts = [
     );
   }
 
-  const userName = user.user_metadata?.name || user.email?.split('@')[0] || 'User';
+  const userName = `${user.first_name} ${user.last_name}`.trim() || user.username;
 
   // Calculate actual streak based on journal entries
   const calculateStreak = (journalEntries: any[]) => {
