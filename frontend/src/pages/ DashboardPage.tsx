@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -8,7 +8,6 @@ import { CreateJournal } from '../components/ui/create-journal';
 import { SimpleJournalCard } from '../components/ui/simple-journal-card';
 import { DashboardHeader } from '../components/layout/dashboard-header';
 import { MoodAnalytics } from '../components/ui/mood-analytics';
-import { supabase } from '@/integrations/supabase/client';
 import { useJournalEntries } from '../hooks/useJournalEntries';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -67,22 +66,6 @@ const dailyPrompts = [
   const [activeTab, setActiveTab] = useState<"entries" | "analytics" | "resources">("entries");
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-
-  // Load avatar on user change (must be declared before early returns to keep hooks order stable)
-  useEffect(() => {
-    const id = user?.id;
-    if (!id) return;
-    supabase
-      .from('profiles')
-      .select('avatar_url')
-      .eq('user_id', id)
-      .maybeSingle()
-      .then(({ data, error }) => {
-        if (!error) setAvatarUrl(data?.avatar_url ?? null);
-      });
-  }, [user?.id]);
-
   const handleCreateEntry = async (newEntry: { title: string; content: string; isPrivate: boolean; isAnonymous: boolean; mood: 'great' | 'good' | 'okay' | 'low' | 'difficult'; hashtags: string[] }) => {
     await createEntry({
       title: newEntry.title,
@@ -209,7 +192,7 @@ const dailyPrompts = [
     <div className="min-h-screen bg-[hsl(var(--color-background))]">
       <DashboardHeader
         userName={userName}
-        avatarUrl={avatarUrl}
+        avatarUrl={null}
         activeTab={activeTab}
         onTabChange={setActiveTab}
       />
@@ -392,7 +375,7 @@ const dailyPrompts = [
                             onEdit={handleUpdateEntry}
                             onDelete={handleDeleteEntry}
                             showManagement={true}
-                            avatarUrl={avatarUrl}
+                            avatarUrl={null}
                           />
                         ))}
                         {!searchQuery && entries.length > 5 && (

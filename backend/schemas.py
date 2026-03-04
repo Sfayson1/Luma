@@ -28,6 +28,11 @@ class UserCreate(BaseModel):
     grad_class: str
     password: str
 
+class UserUpdate(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    email: Optional[str] = None
+
 class UserOut(BaseModel):
     id: int
     username: str
@@ -47,7 +52,7 @@ class PromptOut(BaseModel):
 
     class Config:
         from_attributes = True
-        
+
 # ========== Posts ==========
 class PostIn(BaseModel):
     content: str

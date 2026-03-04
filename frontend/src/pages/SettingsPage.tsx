@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ThemeCustomizer } from '@/components/ui/theme-customizer';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { apiFetch } from '@/lib/api';
 
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/components/ui/theme-provider';
@@ -189,56 +189,18 @@ const ProfileSettingsPage: React.FC<ProfileSettingsPageProps> = ({ onBack }) => 
   const { user } = useAuth();
   const { toast } = useToast();
   const [profile, setProfile] = useState({
-    firstName: user?.user_metadata?.name?.split(' ')[0] || '',
-    lastName: user?.user_metadata?.name?.split(' ')[1] || '',
+    firstName: user?.first_name || '',
+    lastName: user?.last_name || '',
     email: user?.email || '',
-    bio: user?.user_metadata?.bio || '',
-    avatar: user?.user_metadata?.avatar_url || null,
+    bio: '',
+    avatar: null as string | null,
     isPublic: false
   });
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
-const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-  const file = event.target.files?.[0];
-  if (!file || !user) return;
-  try {
-    if (!file.type.startsWith('image/')) {
-      toast({ title: 'Invalid file', description: 'Please select an image file.', variant: 'destructive' });
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      toast({ title: 'File too large', description: 'Max size is 5MB.', variant: 'destructive' });
-      return;
-    }
-
-    const ext = file.name.split('.')?.pop()?.toLowerCase() || 'jpg';
-    const path = `${user.id}/${Date.now()}.${ext}`;
-
-    const { error: uploadError } = await supabase.storage.from('avatars').upload(path, file, {
-      cacheControl: '3600',
-      upsert: true,
-      contentType: file.type,
-    });
-    if (uploadError) throw uploadError;
-
-    const { data: pub } = supabase.storage.from('avatars').getPublicUrl(path);
-    const publicUrl = pub?.publicUrl;
-    if (!publicUrl) throw new Error('Failed to get public URL');
-
-    const { error: updateErr } = await supabase
-      .from('profiles')
-      .update({ avatar_url: publicUrl })
-      .eq('user_id', user.id);
-    if (updateErr) throw updateErr;
-
-    setAvatarPreview(publicUrl);
-    setProfile(prev => ({ ...prev, avatar: publicUrl }));
-    toast({ title: 'Avatar updated' });
-  } catch (err) {
-    console.error('Avatar upload error:', err);
-    toast({ title: 'Error', description: 'Failed to upload avatar', variant: 'destructive' });
-  }
+const handleAvatarUpload = async (_event: React.ChangeEvent<HTMLInputElement>) => {
+  toast({ title: 'Not available', description: 'Avatar upload is not supported yet.', variant: 'destructive' });
 };
 
   const removeAvatar = () => {
@@ -862,28 +824,13 @@ const AccountSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const canSave = password.length >= 8 && password === confirm && !loading;
 
   const handleUpdatePassword = async () => {
-    try {
-      setLoading(true);
-      const { error } = await supabase.auth.updateUser({ password });
-      if (error) throw error;
-      toast({ title: "Password updated", description: "Your password has been changed successfully." });
-      setPassword("");
-      setConfirm("");
-    } catch (e: any) {
-      toast({ title: "Update failed", description: e?.message || "Unable to update password.", variant: "destructive" });
-    } finally {
-      setLoading(false);
-    }
+    toast({ title: "Not available", description: "Password change is not supported yet.", variant: "destructive" });
   };
 
   const handleExportData = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('journal_entries')
-        .select('*')
-        .eq('user_id', user!.id);
-      if (error) throw error;
+      const data = await apiFetch('/api/posts/');
       const blob = new Blob([JSON.stringify(data || [], null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -893,7 +840,8 @@ const AccountSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-      toast({ title: "Export complete", description: `Downloaded ${data?.length || 0} entries.` });
+      const count = Array.isArray(data) ? data.length : 0;
+      toast({ title: "Export complete", description: `Downloaded ${count} entries.` });
     } catch (e: any) {
       toast({ title: "Export failed", description: e?.message || "Unable to export data.", variant: "destructive" });
     } finally {
