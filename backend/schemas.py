@@ -39,8 +39,7 @@ class PromptOut(BaseModel):
 
     class Config:
         from_attributes = True
-
-
+        
 # ========== Posts ==========
 class PostIn(BaseModel):
     content: str
@@ -48,6 +47,9 @@ class PostIn(BaseModel):
     privacy: Optional[str] = "private"
     tags: Optional[str] = None
     prompt_id: Optional[int] = None
+
+class PostCreate(PostIn):
+    pass
 
 class PostOut(BaseModel):
     id: int
