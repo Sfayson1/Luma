@@ -74,7 +74,7 @@ def register(user_data: UserRegister, db: Session = Depends(get_db)):
     # Split name into first and last
     parts = user_data.name.strip().split(" ", 1)
     first_name = parts[0]
-    last_name = parts[1] if len(parts) > 1 else parts[0]
+    last_name = parts[1] if len(parts) > 1 else ""
 
     new_user = User(
         username=username,
