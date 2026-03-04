@@ -1,10 +1,17 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { User, Session } from '@supabase/supabase-js'
-import { supabase } from '../integrations/supabase/client'
+import { apiFetch } from '../lib/api'
+
+export interface AppUser {
+  id: number
+  username: string
+  first_name: string
+  last_name: string
+  email: string
+  grad_class: string
+}
 
 interface AuthContextType {
-  user: User | null
-  session: Session | null
+  user: AppUser | null
   loading: boolean
   signIn: (email: string, password: string) => Promise<{ error: any }>
   signUp: (email: string, password: string, name?: string) => Promise<{ error: any }>
@@ -22,37 +29,32 @@ export const useAuth = () => {
 }
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null)
-  const [session, setSession] = useState<Session | null>(null)
+  const [user, setUser] = useState<AppUser | null>(null)
   const [loading, setLoading] = useState(true)
 
+  // On mount, restore session from stored token
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session)
-        setUser(session?.user ?? null)
-        setLoading(false)
-      }
-    )
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-      setUser(session?.user ?? null)
+    const token = localStorage.getItem('access_token')
+    if (!token) {
       setLoading(false)
-    })
-
-    return () => subscription.unsubscribe()
+      return
+    }
+    apiFetch<AppUser>('/api/auth/me')
+      .then((u) => setUser(u))
+      .catch(() => localStorage.removeItem('access_token'))
+      .finally(() => setLoading(false))
   }, [])
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const data = await apiFetch<{ access_token: string; token_type: string }>('/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
       })
-      return { error }
+      localStorage.setItem('access_token', data.access_token)
+      const me = await apiFetch<AppUser>('/api/auth/me')
+      setUser(me)
+      return { error: null }
     } catch (error) {
       return { error }
     }
@@ -60,41 +62,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, name?: string) => {
     try {
-      const redirectUrl = `${window.location.origin}/`
-
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            name: name || ''
-          }
-        }
+      const data = await apiFetch<{ access_token: string; token_type: string }>('/api/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({ name: name || email.split('@')[0], email, password }),
       })
-      return { error }
+      localStorage.setItem('access_token', data.access_token)
+      const me = await apiFetch<AppUser>('/api/auth/me')
+      setUser(me)
+      return { error: null }
     } catch (error) {
       return { error }
     }
   }
 
   const signOut = async () => {
-    try {
-      await supabase.auth.signOut()
-      window.location.href = '/'
-    } catch (error) {
-      console.error('Error signing out:', error)
-    }
+    localStorage.removeItem('access_token')
+    setUser(null)
+    window.location.href = '/'
   }
 
-  const value = {
-    user,
-    session,
-    loading,
-    signIn,
-    signUp,
-    signOut,
-  }
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>
+      {children}
+    </AuthContext.Provider>
+  )
 }

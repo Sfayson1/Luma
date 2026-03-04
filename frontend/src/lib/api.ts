@@ -1,41 +1,31 @@
-interface ImportMetaEnv {
-  readonly VITE_API_URL: string;
-  // other VITE_… variables you use
+const BASE_URL = import.meta.env.VITE_API_URL;
+
+if (!BASE_URL) {
+  throw new Error("Missing VITE_API_URL");
 }
 
-interface ImportMeta {
-  readonly env: ImportMetaEnv;
-}
-
-const API = import.meta.env.VITE_API_URL;
-
-if (!API) {
-  throw new Error("Missing VITE_API_URL environment variable");
-}
-
-export async function apiFetch<T>(
-  path: string,
-  options: RequestInit = {}
-): Promise<T> {
+export async function apiFetch<T = any>(path: string, options: RequestInit = {}): Promise<T> {
   const token = localStorage.getItem("access_token");
 
-  const headers = new Headers(options.headers || {});
-  headers.set("Content-Type", "application/json");
-
-  if (token) headers.set("Authorization", `Bearer ${token}`);
-
-  const res = await fetch(`${API}${path}`, {
+  const res = await fetch(`${BASE_URL}${path}`, {
     ...options,
-    headers,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options.headers || {}),
+    },
   });
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || `Request failed: ${res.status}`);
+  if (res.status === 204) {
+    return null as T;
   }
 
-  // 204 No Content (delete endpoints etc.)
-  if (res.status === 204) return undefined as T;
+  const text = await res.text();
+  const data = text ? JSON.parse(text) : null;
 
-  return (await res.json()) as T;
+  if (!res.ok) {
+    throw new Error(data?.detail || `Request failed: ${res.status}`);
+  }
+
+  return data as T;
 }

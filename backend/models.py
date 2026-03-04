@@ -4,8 +4,6 @@ from sqlalchemy.orm import relationship
 from database import Base
 from pydantic import BaseModel, Field
 from datetime import date
-from sqlalchemy.dialects.postgresql import UUID
-import uuid
 from typing import Optional
 
 
@@ -17,7 +15,7 @@ class User(Base):
     first_name = Column(String)
     last_name = Column(String)
     email = Column(String, unique=True, index=True)
-    grad_class = Column(String)
+    grad_class = Column(String, default="")
     hashed_password = Column(String)
     posts = relationship("Post", back_populates="owner")
 
@@ -49,9 +47,10 @@ class Post(Base):
     mood = Column(String, nullable=True)
     privacy = Column(String, default="private")
     tags = Column(String, nullable=True)
-    owner_id = Column(UUID(as_uuid=True), nullable=False)
+    owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     prompt_id = Column(Integer, ForeignKey("prompts.id"), nullable=True)
 
+    owner = relationship("User", back_populates="posts")
     prompt = relationship("Prompt", back_populates="posts")
 
 class PostIn(BaseModel):
@@ -75,7 +74,7 @@ class PostOut(BaseModel):
     mood: Optional[str] = None
     privacy: str
     tags: Optional[str] = None
-    owner_id: str
+    owner_id: int
     prompt_id: Optional[int] = None
 
     class Config:
@@ -90,7 +89,7 @@ class PostUpdate(BaseModel):
 class PostOutWithUser(BaseModel):
     id: int
     content: str
-    owner_id: str
+    owner_id: int
     owner: UserOut
     date_posted: date
     mood: Optional[str] = None

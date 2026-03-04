@@ -14,6 +14,12 @@ class UserLogin(BaseModel):
     email: str
     password: str
 
+# Simplified registration schema matching the frontend signup form
+class UserRegister(BaseModel):
+    name: str
+    email: EmailStr
+    password: str
+
 class UserCreate(BaseModel):
     username: str
     first_name: str
@@ -23,10 +29,12 @@ class UserCreate(BaseModel):
     password: str
 
 class UserOut(BaseModel):
-    id: str
+    id: int
     username: str
     first_name: str
     last_name: str
+    email: str
+    grad_class: str
 
     class Config:
         from_attributes = True

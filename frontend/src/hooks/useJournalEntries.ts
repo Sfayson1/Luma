@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "../integrations/supabase/client";
+import { apiFetch } from "../lib/api";
 import { useToast } from "./use-toast";
 import { useAuth } from "./useAuth";
 
@@ -20,6 +20,32 @@ export interface JournalEntry {
   updated_at: string;
 }
 
+// Maps a backend PostOutWithUser object to the frontend JournalEntry shape
+function mapPost(post: any): JournalEntry {
+  const dateStr = post.date_posted ?? new Date().toISOString().split("T")[0];
+  const authorName = post.owner
+    ? `${post.owner.first_name} ${post.owner.last_name}`.trim()
+    : "Anonymous";
+  return {
+    id: String(post.id),
+    title: post.content?.split("\n")[0]?.slice(0, 60) ?? "",
+    content: post.content ?? "",
+    author: authorName,
+    user_id: String(post.owner_id),
+    timestamp: dateStr,
+    is_private: post.privacy === "private",
+    is_anonymous: false,
+    mood: post.mood ?? "okay",
+    hashtags: post.tags
+      ? post.tags.split(",").map((t: string) => t.trim()).filter(Boolean)
+      : [],
+    likes: 0,
+    comments: 0,
+    created_at: dateStr,
+    updated_at: dateStr,
+  };
+}
+
 export function useJournalEntries() {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,7 +53,6 @@ export function useJournalEntries() {
   const { toast } = useToast();
   const { user } = useAuth();
 
-  // Fetch entries
   const fetchEntries = async () => {
     if (!user) {
       setEntries([]);
@@ -38,23 +63,8 @@ export function useJournalEntries() {
     try {
       setLoading(true);
       setError(null);
-
-      const { data, error } = await supabase
-        .from("journal_entries")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-
-      setEntries(
-        (data || []).map((entry) => ({
-          ...entry,
-          content: entry.content ?? "",
-          author: entry.author ?? "Anonymous",
-          hashtags: entry.hashtags ?? [],
-        }))
-      );
+      const data = await apiFetch<any[]>("/api/posts/");
+      setEntries((data || []).map(mapPost));
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to fetch entries";
@@ -69,7 +79,6 @@ export function useJournalEntries() {
     }
   };
 
-  // Create new entry
   const createEntry = async (entry: {
     title: string;
     content: string;
@@ -78,56 +87,37 @@ export function useJournalEntries() {
     mood?: "great" | "good" | "okay" | "low" | "difficult";
     hashtags?: string[];
   }) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to create entries",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        toast({
-          title: "Error",
-          description: "You must be logged in to create entries",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const newEntry = {
-        ...entry,
-        user_id: user.id,
-        author: user.user_metadata?.name || user.email || "Anonymous",
-        mood: entry.mood || "okay",
-        hashtags: entry.hashtags || [],
-        likes: 0,
-        comments: 0,
-        is_anonymous: entry.is_anonymous ?? false,
+      const payload = {
+        content: entry.content,
+        mood: entry.mood ?? "okay",
+        privacy: entry.is_private ? "private" : "public",
+        tags: entry.hashtags?.join(",") ?? "",
       };
 
-      const { data, error } = await supabase
-        .from("journal_entries")
-        .insert([newEntry])
-        .select()
-        .single();
+      const data = await apiFetch<any>("/api/posts/", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
 
-      if (error) throw error;
-
-      // Add to local state for immediate UI update
-      setEntries((prev) => [
-        {
-          ...data,
-          content: data.content ?? "",
-          author: data.author ?? "Anonymous",
-          hashtags: data.hashtags ?? [],
-        },
-        ...prev,
-      ]);
+      const newEntry = mapPost({ ...data, owner: user });
+      setEntries((prev) => [newEntry, ...prev]);
 
       toast({
         title: "Success",
         description: "Journal entry created successfully",
       });
 
-      return data;
+      return newEntry;
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to create entry";
@@ -139,7 +129,6 @@ export function useJournalEntries() {
     }
   };
 
-  // Update entry
   const updateEntry = async (
     id: string,
     updates: {
@@ -151,35 +140,32 @@ export function useJournalEntries() {
       hashtags?: string[];
     }
   ) => {
-    if (!user?.id) return;
+    if (!user) return;
     try {
-      const { data, error } = await supabase
-        .from("journal_entries")
-        .update(updates)
-        .eq("id", id)
-        .eq("user_id", user?.id)
-        .select()
-        .single();
+      const payload: Record<string, any> = {};
+      if (updates.content !== undefined) payload.content = updates.content;
+      if (updates.mood !== undefined) payload.mood = updates.mood;
+      if (updates.is_private !== undefined)
+        payload.privacy = updates.is_private ? "private" : "public";
+      if (updates.hashtags !== undefined)
+        payload.tags = updates.hashtags.join(",");
 
-      if (error) throw error;
+      const data = await apiFetch<any>(`/api/posts/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(payload),
+      });
 
-      // Update local state
-      setEntries((prev) => [
-        {
-            ...(data as JournalEntry),
-            content: data.content ?? "",
-            author: data.author ?? "Anonymous",
-            hashtags: data.hashtags ?? [],
-        },
-        ...prev,
-      ]);
+      const updated = mapPost(data);
+      setEntries((prev) =>
+        prev.map((e) => (e.id === String(id) ? updated : e))
+      );
 
       toast({
         title: "Success",
         description: "Journal entry updated successfully",
       });
 
-      return data;
+      return updated;
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to update entry";
@@ -191,20 +177,11 @@ export function useJournalEntries() {
     }
   };
 
-  // Delete entry
   const deleteEntry = async (id: string) => {
-    if (!user?.id) return;
+    if (!user) return;
     try {
-      const { error } = await supabase
-        .from("journal_entries")
-        .delete()
-        .eq("id", id)
-        .eq("user_id", user?.id);
-
-      if (error) throw error;
-
-      // Remove from local state
-      setEntries((prev) => prev.filter((entry) => entry.id !== id));
+      await apiFetch(`/api/posts/${id}`, { method: "DELETE" });
+      setEntries((prev) => prev.filter((e) => e.id !== String(id)));
 
       toast({
         title: "Success",

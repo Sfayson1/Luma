@@ -6,9 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { Heart, Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 
 const SignUpPage = () => {
   const navigate = useNavigate();
+  const { signUp } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -31,18 +33,12 @@ const SignUpPage = () => {
       return;
     }
 
-    // Simulate signup - replace with actual auth logic
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      if (formData.name && formData.email && formData.password) {
-        navigate('/dashboard');
-      } else {
-        setError('Please fill in all fields');
-      }
-    } catch (err) {
-      setError('Signup failed. Please try again.');
-    } finally {
+    const { error: authError } = await signUp(formData.email, formData.password, formData.name);
+    if (authError) {
+      setError(authError instanceof Error ? authError.message : 'Signup failed. Please try again.');
       setIsLoading(false);
+    } else {
+      navigate('/dashboard');
     }
   };
 
