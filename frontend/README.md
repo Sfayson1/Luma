@@ -1,12 +1,63 @@
-# React + Vite
+# Luma — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + TypeScript + Vite frontend for [Luma](https://www.lumajournal.com), a private journaling app.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React 19** + **TypeScript**
+- **Vite 7** — build tool with HMR
+- **Tailwind CSS v4** — styling
+- **Radix UI** — accessible component primitives
+- **Tiptap** — rich text editor for journal entries
+- **Recharts** — mood analytics charts
+- **React Router v7** — client-side routing
+- **Lucide React** — icons
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+npm run dev
+```
+
+App runs at `http://localhost:5173`.
+
+Create a `.env` file at the root of `frontend/`:
+
+```env
+VITE_API_URL=http://localhost:8000
+```
+
+## Scripts
+
+| Command | Description |
+|---|---|
+| `npm run dev` | Start dev server |
+| `npm run build` | Production build |
+| `npm run preview` | Preview production build |
+| `npm run lint` | Run ESLint |
+
+## Structure
+
+```
+src/
+├── components/
+│   ├── layout/      # DashboardHeader, navigation
+│   └── ui/          # Cards, modals, forms, analytics charts
+├── hooks/           # useAuth, useJournalEntries, useToast
+├── lib/             # apiFetch helper
+├── pages/           # DashboardPage, SettingsPage, auth pages
+└── services/        # analyticsService
+```
+
+## Deployment
+
+Deployed on **Vercel**. Auto-deploys on push to `main`.
+
+`vercel.json` includes a catch-all rewrite rule so React Router works correctly on hard reload:
+
+```json
+{
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
+```
