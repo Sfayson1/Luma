@@ -196,15 +196,7 @@ const themes = [
 ]
 
 export function ThemeCustomizer() {
-  const [selectedTheme, setSelectedTheme] = useState("Default")
-
-  useEffect(() => {
-    const saved = localStorage.getItem("luma-theme")
-    if (saved) {
-      const theme = themes.find(t => t.name === saved)
-      if (theme) applyTheme(theme)
-    }
-  }, [])
+  const [selectedTheme, setSelectedTheme] = useState(() => localStorage.getItem("luma-theme") || "Default")
 
   const applyTheme = (theme: typeof themes[0]) => {
     const root = document.documentElement
@@ -218,6 +210,14 @@ export function ThemeCustomizer() {
     setSelectedTheme(theme.name)
     localStorage.setItem("luma-theme", theme.name)
   }
+
+  useEffect(() => {
+    const saved = localStorage.getItem("luma-theme")
+    if (saved) {
+      const theme = themes.find(t => t.name === saved)
+      if (theme) applyTheme(theme)
+    }
+  }, [])
 
   const resetToDefault = () => {
     const root = document.documentElement
