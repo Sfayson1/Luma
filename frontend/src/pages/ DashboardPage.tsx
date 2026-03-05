@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -10,6 +10,7 @@ import { DashboardHeader } from '../components/layout/dashboard-header';
 import { MoodAnalytics } from '../components/ui/mood-analytics';
 import { useJournalEntries } from '../hooks/useJournalEntries';
 import { useAuth } from '../hooks/useAuth';
+import { apiFetch } from '../lib/api';
 import {
   TrendingUp,
   Calendar,
@@ -44,20 +45,16 @@ const moodColors = {
   difficult: 'bg-[hsl(var(--color-healing)_/_0.1)] text-[hsl(var(--color-healing))] border-[hsl(var(--color-healing)_/_0.3)]'
 };
 
-const dailyPrompts = [
-  "What brought you joy today?",
-  "How did you practice self-care this week?",
-  "What's one thing you're grateful for right now?",
-  "How are you feeling in this moment?",
-  "What would you tell your past self?",
-  "What challenged you today and how did you grow?",
-  "Describe a moment that made you smile recently."
-];
-
  const DashboardPage = () => {
   const { user, loading: authLoading } = useAuth();
   const { entries, loading: entriesLoading, createEntry, updateEntry, deleteEntry } = useJournalEntries();
-  const [currentPrompt] = useState(dailyPrompts[new Date().getDay() % dailyPrompts.length]);
+  const [currentPrompt, setCurrentPrompt] = useState("What's on your mind today?");
+
+  useEffect(() => {
+    apiFetch<{ content: string }>('/api/prompts/prompt-of-the-day')
+      .then(data => setCurrentPrompt(data.content))
+      .catch(() => {}); // silently keep the fallback
+  }, []);
   const [activeTab, setActiveTab] = useState<"entries" | "analytics" | "resources">("entries");
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
