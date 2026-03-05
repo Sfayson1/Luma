@@ -28,7 +28,14 @@ interface CreateJournalProps {
 export const CreateJournal = ({ onSubmit }: CreateJournalProps) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [isPrivate, setIsPrivate] = useState(false);
+  const [isPrivate, setIsPrivate] = useState(() => {
+    try {
+      const saved = localStorage.getItem('journal-settings');
+      return saved ? JSON.parse(saved).defaultPrivacy === true : false;
+    } catch {
+      return false;
+    }
+  });
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [mood, setMood] = useState<
     "great" | "good" | "okay" | "low" | "difficult"
