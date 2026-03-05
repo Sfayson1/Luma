@@ -1,8 +1,12 @@
 # Luma
 
+[![Lint](https://github.com/Sfayson1/Luma/actions/workflows/lint.yml/badge.svg)](https://github.com/Sfayson1/Luma/actions/workflows/lint.yml)
+[![Tests](https://github.com/Sfayson1/Luma/actions/workflows/test.yml/badge.svg)](https://github.com/Sfayson1/Luma/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/Sfayson1/Luma/branch/main/graph/badge.svg)](https://codecov.io/gh/Sfayson1/Luma)
+
 A private, personal journaling app for mindful self-reflection. Luma lets you write freely, track your mood over time, and gain insight into your emotional patterns — all in a space that belongs only to you. No followers, no likes, no social noise.
 
- [Demo](https://www.lumajournal.com/demo)
+[Demo](https://www.lumajournal.com/demo)
 
 ---
 
@@ -172,6 +176,18 @@ All protected routes require an `Authorization: Bearer <token>` header.
 | Variable | Description |
 |---|---|
 | `VITE_API_URL` | Backend base URL |
+
+---
+
+## Architecture
+
+See [`docs/architecture.md`](docs/architecture.md) for Mermaid diagrams covering the system overview, request flow, auth flow, and data model.
+
+---
+
+## Observability
+
+The backend logs all requests via Uvicorn's access log (method, path, status code, response time) and surfaces errors through FastAPI's default exception handlers. In production, the key signals to monitor are HTTP 401/403 rates (auth failures), 500 error frequency, and `/api/posts/` response latency as the primary data-path endpoint. Render exposes these logs in the dashboard; adding structured logging (e.g. `structlog`) and a log drain to Datadog or Logtail would be the next step for alerting.
 
 ---
 
