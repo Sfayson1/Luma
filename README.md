@@ -2,7 +2,7 @@
 
 A private, personal journaling app for mindful self-reflection. Luma lets you write freely, track your mood over time, and gain insight into your emotional patterns — all in a space that belongs only to you. No followers, no likes, no social noise.
 
-**Demo:** [www.lumajournal.com](https://www.lumajournal.com/demo)
+ [Demo](https://www.lumajournal.com/demo)
 
 ---
 
