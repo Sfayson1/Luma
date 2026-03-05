@@ -14,7 +14,6 @@ import  DashboardPage from './pages/ DashboardPage';
 import  ForgotPasswordPage  from "./pages/ForgotPasswordPage";
 import AuthPage from "./pages/AuthPage";
 import NotFound from "./pages/NotFound";
-import ProfilePage from "./pages/ProfilePage";
 import  SettingsPage  from "./pages/SettingsPage";
 
 const queryClient = new QueryClient();
@@ -39,7 +38,6 @@ const App = () => {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="*" element={<NotFound />} />

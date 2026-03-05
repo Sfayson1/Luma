@@ -16,7 +16,7 @@ def read_posts(
 ):
     return (
         db.query(Post)
-        .filter((Post.privacy != "private") | (Post.owner_id == current_user.id))
+        .filter(Post.owner_id == current_user.id)
         .all()
     )
 

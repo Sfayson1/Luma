@@ -38,7 +38,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ onBack }) => {
       id: 'privacy',
       title: 'Privacy & Security',
       icon: Lock,
-      description: 'Control who can see your content',
+      description: 'Security and data settings',
       onClick: () => setCurrentPage('privacy')
     },
     {
@@ -352,35 +352,13 @@ const handleAvatarUpload = async (_event: React.ChangeEvent<HTMLInputElement>) =
 
 // Other settings pages with proper styling
 const PrivacySettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-  const [settings, setSettings] = useState({
-    dataSharing: false,
-    blockedUsers: [] as string[],
+  const [dataSharing, setDataSharing] = React.useState(() => {
+    try { return JSON.parse(localStorage.getItem('privacy-settings') || '{}').dataSharing ?? false; } catch { return false; }
   });
-  const [blockInput, setBlockInput] = useState("");
 
-  // Load from localStorage once
-  React.useEffect(() => {
-    const saved = localStorage.getItem('privacy-settings');
-    if (saved) {
-      try { setSettings(JSON.parse(saved)); } catch {}
-    }
-  }, []);
-
-  const saveSettings = (next: typeof settings) => {
-    setSettings(next);
-    localStorage.setItem('privacy-settings', JSON.stringify(next));
-  };
-
-  const addBlocked = () => {
-    const val = blockInput.trim();
-    if (!val) return;
-    if (settings.blockedUsers.includes(val)) return setBlockInput("");
-    saveSettings({ ...settings, blockedUsers: [...settings.blockedUsers, val] });
-    setBlockInput("");
-  };
-
-  const removeBlocked = (name: string) => {
-    saveSettings({ ...settings, blockedUsers: settings.blockedUsers.filter(u => u !== name) });
+  const save = (checked: boolean) => {
+    setDataSharing(checked);
+    localStorage.setItem('privacy-settings', JSON.stringify({ dataSharing: checked }));
   };
 
   return (
@@ -397,36 +375,6 @@ const PrivacySettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       <div className="p-6 space-y-6">
         <Card className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))]">
           <CardHeader>
-            <CardTitle className="text-[hsl(var(--color-foreground))]">Blocked Users</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label className="text-base font-medium text-[hsl(var(--color-foreground))]">Blocked users</Label>
-              <div className="mt-2 flex gap-2">
-                <Input
-                  placeholder="Username or email"
-                  value={blockInput}
-                  onChange={(e) => setBlockInput(e.target.value)}
-                  className="bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))] border-[hsl(var(--color-border))] placeholder:text-[hsl(var(--color-muted-foreground))]"
-                />
-                <Button onClick={addBlocked} className="bg-[hsl(var(--color-primary))] text-[hsl(var(--color-primary-foreground))] hover:bg-[hsl(var(--color-primary)_/_0.9)]">Block</Button>
-              </div>
-              {settings.blockedUsers.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {settings.blockedUsers.map((u) => (
-                    <span key={u} className="px-2 py-1 rounded-full text-xs bg-[hsl(var(--color-muted))] text-[hsl(var(--color-foreground))] border border-[hsl(var(--color-border))]">
-                      {u}
-                      <button className="ml-2 text-[hsl(var(--color-muted-foreground))] hover:text-[hsl(var(--color-foreground))]" onClick={() => removeBlocked(u)}>×</button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))]">
-          <CardHeader>
             <CardTitle className="text-[hsl(var(--color-foreground))]">Data & Security</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -435,10 +383,7 @@ const PrivacySettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 <Label className="text-base font-medium text-[hsl(var(--color-foreground))]">Anonymous analytics</Label>
                 <p className="text-sm text-[hsl(var(--color-muted-foreground))]">Help us improve by sharing usage metrics</p>
               </div>
-              <Switch
-                checked={settings.dataSharing}
-                onCheckedChange={(checked) => saveSettings({ ...settings, dataSharing: checked })}
-              />
+              <Switch checked={dataSharing} onCheckedChange={save} />
             </div>
           </CardContent>
         </Card>
