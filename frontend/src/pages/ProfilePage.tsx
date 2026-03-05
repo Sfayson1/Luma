@@ -10,7 +10,7 @@ import { useToast } from '@/hooks/use-toast'
 import { Save, User } from 'lucide-react'
 
 const ProfilePage = () => {
-  const { user } = useAuth()
+  const { user, refreshUser } = useAuth()
   const { toast } = useToast()
   const [saving, setSaving] = useState(false)
   const [formData, setFormData] = useState({
@@ -35,6 +35,7 @@ const ProfilePage = () => {
         method: 'PATCH',
         body: JSON.stringify(formData),
       })
+      await refreshUser()
       toast({ title: 'Profile updated successfully' })
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to update profile', variant: 'destructive' })
