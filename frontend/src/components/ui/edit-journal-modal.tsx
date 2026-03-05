@@ -4,7 +4,6 @@ import { Button } from './button';
 import { Input } from './input';
 import { Label } from './label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
-import { Switch } from './switch';
 import { RichTextEditor } from './rich-text-editor';
 import { JournalEntry } from '../../hooks/useJournalEntries';
 import { Save, X } from 'lucide-react';
@@ -16,7 +15,6 @@ interface EditJournalModalProps {
   onSave: (updates: {
     title: string;
     content: string;
-    is_private: boolean;
     mood: 'great' | 'good' | 'okay' | 'low' | 'difficult';
     hashtags: string[];
   }) => Promise<void>;
@@ -26,7 +24,6 @@ export const EditJournalModal = ({ open, onOpenChange, entry, onSave }: EditJour
   const [formData, setFormData] = useState({
     title: '',
     content: '',
-    is_private: true,
     mood: 'okay' as 'great' | 'good' | 'okay' | 'low' | 'difficult',
     hashtags: [] as string[]
   });
@@ -39,7 +36,6 @@ export const EditJournalModal = ({ open, onOpenChange, entry, onSave }: EditJour
       setFormData({
         title: entry.title,
         content: entry.content,
-        is_private: entry.is_private,
         mood: entry.mood,
         hashtags: entry.hashtags || []
       });
@@ -109,46 +105,26 @@ export const EditJournalModal = ({ open, onOpenChange, entry, onSave }: EditJour
             />
           </div>
 
-          {/* Mood and Privacy Row */}
-          <div className="grid grid-cols-2 gap-4">
-            {/* Mood */}
-            <div className="space-y-2">
-              <Label htmlFor="mood">Mood</Label>
-              <Select
-                value={formData.mood}
-                onValueChange={(value: 'great' | 'good' | 'okay' | 'low' | 'difficult') =>
-                  setFormData(prev => ({ ...prev, mood: value }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="great">😄 Great</SelectItem>
-                  <SelectItem value="good">😊 Good</SelectItem>
-                  <SelectItem value="okay">😐 Okay</SelectItem>
-                  <SelectItem value="low">😔 Low</SelectItem>
-                  <SelectItem value="difficult">😟 Difficult</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Privacy */}
-            <div className="space-y-2">
-              <Label htmlFor="privacy">Privacy</Label>
-              <div className="flex items-center gap-2 h-10">
-                <Switch
-                  id="privacy"
-                  checked={!formData.is_private}
-                  onCheckedChange={(checked) =>
-                    setFormData(prev => ({ ...prev, is_private: !checked }))
-                  }
-                />
-                <span className="text-sm text-[hsl(var(--color-muted-foreground))]">
-                  {formData.is_private ? 'Private' : 'Public'}
-                </span>
-              </div>
-            </div>
+          {/* Mood */}
+          <div className="space-y-2">
+            <Label htmlFor="mood">Mood</Label>
+            <Select
+              value={formData.mood}
+              onValueChange={(value: 'great' | 'good' | 'okay' | 'low' | 'difficult') =>
+                setFormData(prev => ({ ...prev, mood: value }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="great">😄 Great</SelectItem>
+                <SelectItem value="good">😊 Good</SelectItem>
+                <SelectItem value="okay">😐 Okay</SelectItem>
+                <SelectItem value="low">😔 Low</SelectItem>
+                <SelectItem value="difficult">😟 Difficult</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Hashtags */}

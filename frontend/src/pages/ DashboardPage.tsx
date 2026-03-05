@@ -66,8 +66,7 @@ const dailyPrompts = [
     await createEntry({
       title: newEntry.title,
       content: newEntry.content,
-      is_private: newEntry.isPrivate,
-      is_anonymous: newEntry.isAnonymous,
+      is_private: true,
       mood: newEntry.mood,
       hashtags: newEntry.hashtags
     });
