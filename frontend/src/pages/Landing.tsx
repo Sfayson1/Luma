@@ -23,11 +23,18 @@ const Landing = () => {
           <p className="text-xl md:text-2xl text-[hsl(var(--color-muted-foreground))] mb-10 max-w-2xl mx-auto">
             A journaling space for quiet minds and honest reflections.
           </p>
-          <Link to="/auth">
-            <button className="bg-[hsl(var(--color-primary))] hover:bg-[hsl(var(--color-serenity))] text-[hsl(var(--color-primary-foreground))] px-8 py-4 rounded-full font-bold text-lg transition-[var(--transition-gentle)] shadow-[var(--shadow-gentle)] hover:shadow-[var(--shadow-warm)] hover:-translate-y-1">
-              Start Journaling
-            </button>
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link to="/auth">
+              <button className="bg-[hsl(var(--color-primary))] hover:bg-[hsl(var(--color-serenity))] text-[hsl(var(--color-primary-foreground))] px-8 py-4 rounded-full font-bold text-lg transition-[var(--transition-gentle)] shadow-[var(--shadow-gentle)] hover:shadow-[var(--shadow-warm)] hover:-translate-y-1">
+                Start Journaling
+              </button>
+            </Link>
+            <Link to="/demo">
+              <button className="border-2 border-[hsl(var(--color-primary))] text-[hsl(var(--color-primary))] hover:bg-[hsl(var(--color-primary)_/_0.08)] px-8 py-4 rounded-full font-bold text-lg transition-[var(--transition-gentle)] hover:-translate-y-1">
+                Try the demo
+              </button>
+            </Link>
+          </div>
         </section>
 
         {/* Daily Prompts Section */}
@@ -95,11 +102,18 @@ const Landing = () => {
             Join our mindful community today and start your journey towards a
             calmer, more reflective self.
           </p>
-          <Link to="/auth">
-            <button className="bg-[hsl(var(--color-primary))] hover:bg-[hsl(var(--color-serenity))] text-[hsl(var(--color-primary-foreground))] px-8 py-4 rounded-full font-bold text-lg transition-[var(--transition-gentle)] shadow-[var(--shadow-gentle)] hover:shadow-[var(--shadow-warm)] hover:-translate-y-1">
-              Join Luma Today
-            </button>
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link to="/auth">
+              <button className="bg-[hsl(var(--color-primary))] hover:bg-[hsl(var(--color-serenity))] text-[hsl(var(--color-primary-foreground))] px-8 py-4 rounded-full font-bold text-lg transition-[var(--transition-gentle)] shadow-[var(--shadow-gentle)] hover:shadow-[var(--shadow-warm)] hover:-translate-y-1">
+                Join Luma Today
+              </button>
+            </Link>
+            <Link to="/demo">
+              <button className="border-2 border-[hsl(var(--color-primary))] text-[hsl(var(--color-primary))] hover:bg-[hsl(var(--color-primary)_/_0.08)] px-8 py-4 rounded-full font-bold text-lg transition-[var(--transition-gentle)] hover:-translate-y-1">
+                Try the demo
+              </button>
+            </Link>
+          </div>
         </section>
       </div>
 
