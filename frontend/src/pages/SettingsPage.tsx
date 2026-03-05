@@ -538,17 +538,25 @@ const NotificationSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) 
 };
 
 const JournalSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-  const [settings, setSettings] = useState({
-    defaultPrivacy: false,
-    defaultMood: 'okay',
-    autoSave: true,
-    writingReminders: true,
-    reminderTime: '19:00',
-    weeklyGoal: 3,
-    showWordCount: true,
-    enableSpellCheck: true,
-    fontSize: 'medium',
-    lineSpacing: 'normal'
+  const [settings, setSettings] = useState(() => {
+    const defaults = {
+      defaultPrivacy: false,
+      defaultMood: 'okay',
+      autoSave: true,
+      writingReminders: true,
+      reminderTime: '19:00',
+      weeklyGoal: 3,
+      showWordCount: true,
+      enableSpellCheck: true,
+      fontSize: 'medium',
+      lineSpacing: 'normal'
+    };
+    try {
+      const saved = localStorage.getItem('journal-settings');
+      return saved ? { ...defaults, ...JSON.parse(saved) } : defaults;
+    } catch {
+      return defaults;
+    }
   });
 
   const saveSettings = (newSettings: typeof settings) => {
