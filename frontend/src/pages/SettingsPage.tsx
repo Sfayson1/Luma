@@ -836,16 +836,30 @@ const DisplaySettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 };
 
 const AccountSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-  const { user } = useAuth();
   const { toast } = useToast();
+  const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const canSave = password.length >= 8 && password === confirm && !loading;
+  const canSave = currentPassword.length > 0 && password.length >= 8 && password === confirm && !loading;
 
   const handleUpdatePassword = async () => {
-    toast({ title: "Not available", description: "Password change is not supported yet.", variant: "destructive" });
+    setLoading(true);
+    try {
+      await apiFetch('/api/auth/change-password', {
+        method: 'POST',
+        body: JSON.stringify({ current_password: currentPassword, new_password: password }),
+      });
+      toast({ title: "Password updated", description: "Your password has been changed successfully." });
+      setCurrentPassword("");
+      setPassword("");
+      setConfirm("");
+    } catch (e: any) {
+      toast({ title: "Failed", description: e?.message || "Could not update password.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleExportData = async () => {
@@ -886,6 +900,16 @@ const AccountSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             <CardTitle className="text-[hsl(var(--color-foreground))]">Change Password</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="current-password" className="text-[hsl(var(--color-foreground))]">Current password</Label>
+              <Input
+                id="current-password"
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                className="bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))] border-[hsl(var(--color-border))]"
+              />
+            </div>
             <div>
               <Label htmlFor="new-password" className="text-[hsl(var(--color-foreground))]">New password</Label>
               <Input
