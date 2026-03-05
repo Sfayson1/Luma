@@ -20,7 +20,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from database import Base, get_db
-import models  # noqa: registers ORM models with Base.metadata
+import models  # noqa: F401
 from routers import auth, posts
 
 engine = create_engine(
