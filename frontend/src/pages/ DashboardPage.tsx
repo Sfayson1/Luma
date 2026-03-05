@@ -10,7 +10,6 @@ import { DashboardHeader } from '../components/layout/dashboard-header';
 import { MoodAnalytics } from '../components/ui/mood-analytics';
 import { useJournalEntries } from '../hooks/useJournalEntries';
 import { useAuth } from '../hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
 import {
   Heart,
   TrendingUp,
@@ -27,9 +26,7 @@ import {
   BookOpen,
   Target,
   Award,
-  Share2,
-  Search,
-  Users
+  Search
 } from 'lucide-react';
 
 const moodIcons = {
@@ -60,7 +57,6 @@ const dailyPrompts = [
 
  const DashboardPage = () => {
   const { user, loading: authLoading } = useAuth();
-  const navigate = useNavigate();
   const { entries, loading: entriesLoading, createEntry, updateEntry, deleteEntry } = useJournalEntries();
   const [currentPrompt] = useState(dailyPrompts[new Date().getDay() % dailyPrompts.length]);
   const [activeTab, setActiveTab] = useState<"entries" | "analytics" | "resources">("entries");
@@ -177,7 +173,6 @@ const dailyPrompts = [
   });
 
   const totalEntries = entries.length;
-  const publicEntries = entries.filter(e => !e.is_private).length;
   const totalLikes = entries.reduce((sum, entry) => sum + (entry.likes || 0), 0);
   const thisWeekEntries = entries.filter(entry => {
     const entryDate = new Date(entry.created_at);
@@ -311,23 +306,6 @@ const dailyPrompts = [
                   </Card>
                 )}
 
-                {/* Community Link */}
-                <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/community')} style={{ border: '1px solid hsl(var(--color-primary) / 0.2)' }}>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Users className="h-5 w-5" />
-                      Community Feed
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-[hsl(var(--color-muted-foreground))] mb-4">
-                      Discover stories from fellow journal writers, find inspiration, and connect with the community.
-                    </p>
-                    <Button variant="outline" className="w-full" style={{ border: '1px solid hsl(var(--color-primary) / 0.2)' }}>
-                      Explore Community
-                    </Button>
-                  </CardContent>
-                </Card>
 
                 {/* Recent Entries */}
                 <Card style={{ border: '1px solid hsl(var(--color-primary) / 0.2)' }}>
@@ -556,17 +534,6 @@ const dailyPrompts = [
                     </div>
                   )}
 
-                  {publicEntries > 0 && (
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-[hsl(var(--color-healing)_/_0.2)] rounded-full flex items-center justify-center">
-                        <Share2 className="h-4 w-4 text-[hsl(var(--color-healing))]" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">Community Builder</p>
-                        <p className="text-xs text-[hsl(var(--color-muted-foreground))]">Shared publicly</p>
-                      </div>
-                    </div>
-                  )}
 
                   {totalEntries === 0 && (
                     <div className="text-center py-4">

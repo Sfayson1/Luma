@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { ChevronRight, ArrowLeft, User, Lock, Bell, BookOpen, Palette, Settings, HelpCircle, Info, Upload, X, Shield, MessageCircle, Eye, EyeOff, Database, Download } from 'lucide-react';
+import { ChevronRight, ArrowLeft, User, Lock, Bell, BookOpen, Palette, Settings, HelpCircle, Info, Upload, X, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
@@ -342,16 +341,6 @@ const handleAvatarUpload = async (_event: React.ChangeEvent<HTMLInputElement>) =
               </div>
             </div>
 
-            <div className="flex items-center justify-between py-2">
-              <div>
-                <Label className="text-base font-medium text-[hsl(var(--color-foreground))]">Public Profile</Label>
-                <p className="text-sm text-[hsl(var(--color-muted-foreground))]">Allow others to find and view your profile</p>
-              </div>
-              <Switch
-                checked={profile.isPublic}
-                onCheckedChange={(checked) => setProfile(prev => ({ ...prev, isPublic: checked }))}
-              />
-            </div>
           </CardContent>
         </Card>
 
@@ -364,10 +353,6 @@ const handleAvatarUpload = async (_event: React.ChangeEvent<HTMLInputElement>) =
 // Other settings pages with proper styling
 const PrivacySettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [settings, setSettings] = useState({
-    profilePublic: false,
-    allowComments: true,
-    allowDMs: false,
-    showLikes: true,
     dataSharing: false,
     blockedUsers: [] as string[],
   });
@@ -412,60 +397,9 @@ const PrivacySettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       <div className="p-6 space-y-6">
         <Card className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))]">
           <CardHeader>
-            <CardTitle className="text-[hsl(var(--color-foreground))]">Visibility</CardTitle>
+            <CardTitle className="text-[hsl(var(--color-foreground))]">Blocked Users</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="text-base font-medium text-[hsl(var(--color-foreground))]">Public profile</Label>
-                <p className="text-sm text-[hsl(var(--color-muted-foreground))]">Allow others to find and view your profile</p>
-              </div>
-              <Switch
-                checked={settings.profilePublic}
-                onCheckedChange={(checked) => saveSettings({ ...settings, profilePublic: checked })}
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="text-base font-medium text-[hsl(var(--color-foreground))]">Show likes count</Label>
-                <p className="text-sm text-[hsl(var(--color-muted-foreground))]">Display total likes on your public entries</p>
-              </div>
-              <Switch
-                checked={settings.showLikes}
-                onCheckedChange={(checked) => saveSettings({ ...settings, showLikes: checked })}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-[hsl(var(--color-background))] border-[hsl(var(--color-border))]">
-          <CardHeader>
-            <CardTitle className="text-[hsl(var(--color-foreground))]">Interactions</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="text-base font-medium text-[hsl(var(--color-foreground))]">Allow comments</Label>
-                <p className="text-sm text-[hsl(var(--color-muted-foreground))]">People can comment on your public posts</p>
-              </div>
-              <Switch
-                checked={settings.allowComments}
-                onCheckedChange={(checked) => saveSettings({ ...settings, allowComments: checked })}
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="text-base font-medium text-[hsl(var(--color-foreground))]">Allow direct messages</Label>
-                <p className="text-sm text-[hsl(var(--color-muted-foreground))]">Receive messages from the community</p>
-              </div>
-              <Switch
-                checked={settings.allowDMs}
-                onCheckedChange={(checked) => saveSettings({ ...settings, allowDMs: checked })}
-              />
-            </div>
-
             <div>
               <Label className="text-base font-medium text-[hsl(var(--color-foreground))]">Blocked users</Label>
               <div className="mt-2 flex gap-2">
@@ -580,17 +514,6 @@ const JournalSettingsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             <CardTitle className="text-[hsl(var(--color-foreground))]">Default Settings</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="text-base font-medium text-[hsl(var(--color-foreground))]">Private by default</Label>
-                <p className="text-sm text-[hsl(var(--color-muted-foreground))]">New entries will be private unless changed</p>
-              </div>
-              <Switch
-                checked={settings.defaultPrivacy}
-                onCheckedChange={(checked) => saveSettings({ ...settings, defaultPrivacy: checked })}
-              />
-            </div>
-
             <div>
               <Label htmlFor="defaultMood" className="text-base font-medium text-[hsl(var(--color-foreground))]">Default mood</Label>
               <select

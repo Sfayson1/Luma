@@ -11,7 +11,6 @@ import  Landing  from "./pages/Landing";
 import  LoginPage  from "./pages/LoginPage";
 import  SignUpPage  from "./pages/SignUpPage";
 import  DashboardPage from './pages/ DashboardPage';
-import { CommunityFeed } from "./pages/CommunityFeed";
 import  ForgotPasswordPage  from "./pages/ForgotPasswordPage";
 import AuthPage from "./pages/AuthPage";
 import NotFound from "./pages/NotFound";
@@ -40,7 +39,6 @@ const App = () => {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/community" element={<CommunityFeed />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />

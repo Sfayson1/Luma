@@ -3,9 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "./card";
 import { Button } from "./button";
 import { Input } from "./input";
 import { Textarea } from "./textarea";
-import { Switch } from "./switch";
 import { Label } from "./label";
-import { PenTool, Eye, EyeOff } from "lucide-react";
+import { PenTool } from "lucide-react";
 import {
   Select,
   SelectTrigger,
@@ -28,15 +27,6 @@ interface CreateJournalProps {
 export const CreateJournal = ({ onSubmit }: CreateJournalProps) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [isPrivate, setIsPrivate] = useState(() => {
-    try {
-      const saved = localStorage.getItem('journal-settings');
-      return saved ? JSON.parse(saved).defaultPrivacy === true : false;
-    } catch {
-      return false;
-    }
-  });
-  const [isAnonymous, setIsAnonymous] = useState(false);
   const [mood, setMood] = useState<
     "great" | "good" | "okay" | "low" | "difficult"
   >("okay");
@@ -57,8 +47,8 @@ export const CreateJournal = ({ onSubmit }: CreateJournalProps) => {
       onSubmit({
         title: title.trim(),
         content: content.trim(),
-        isPrivate,
-        isAnonymous,
+        isPrivate: true,
+        isAnonymous: false,
         mood,
         hashtags: tags,
       });
@@ -163,47 +153,6 @@ export const CreateJournal = ({ onSubmit }: CreateJournalProps) => {
             </p>
           </div>
 
-          <div className="flex items-center justify-between p-3 bg-[hsl(var(--color-serenity)_/_0.5)] rounded-lg border border-[hsl(var(--color-border)_/_0.3)]">
-            <div className="flex items-center gap-2">
-              {isPrivate ? (
-                <EyeOff className="h-4 w-4 text-[hsl(var(--color-muted-foreground))]" />
-              ) : (
-                <Eye className="h-4 w-4 text-[hsl(var(--color-muted-foreground))]" />
-              )}
-              <Label
-                htmlFor="privacy-toggle"
-                className="text-sm font-medium cursor-pointer"
-              >
-                {isPrivate
-                  ? "Private (only you can see this)"
-                  : "Public (visible to community)"}
-              </Label>
-            </div>
-            <Switch
-              id="privacy-toggle"
-              checked={isPrivate}
-              onCheckedChange={setIsPrivate}
-            />
-          </div>
-
-          <div className="flex items-center justify-between p-3 bg-[hsl(var(--color-serenity)_/_0.7)] rounded-lg border border-[hsl(var(--color-border)_/_0.3)]">
-            <div className="flex items-center gap-2">
-              <Label
-                htmlFor="anonymous-toggle"
-                className="text-sm font-medium cursor-pointer"
-              >
-                Post anonymously
-              </Label>
-              <span className="text-sm text-[hsl(var(--color-muted-foreground))]">
-                Hide your name and avatar on public feeds.
-              </span>
-            </div>
-            <Switch
-              id="anonymous-toggle"
-              checked={isAnonymous}
-              onCheckedChange={setIsAnonymous}
-            />
-          </div>
 
           <Button
             type="submit"

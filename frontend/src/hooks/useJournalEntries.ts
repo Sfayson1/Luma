@@ -11,7 +11,6 @@ export interface JournalEntry {
   user_id: string;
   timestamp: string;
   is_private: boolean;
-  is_anonymous?: boolean;
   mood: "great" | "good" | "okay" | "low" | "difficult";
   hashtags: string[];
   likes: number;
@@ -34,7 +33,6 @@ function mapPost(post: any): JournalEntry {
     user_id: String(post.owner_id),
     timestamp: dateStr,
     is_private: post.privacy === "private",
-    is_anonymous: false,
     mood: post.mood ?? "okay",
     hashtags: post.tags
       ? post.tags.split(",").map((t: string) => t.trim()).filter(Boolean)
@@ -83,8 +81,7 @@ export function useJournalEntries() {
     title: string;
     content: string;
     is_private: boolean;
-    is_anonymous?: boolean;
-    mood?: "great" | "good" | "okay" | "low" | "difficult";
+      mood?: "great" | "good" | "okay" | "low" | "difficult";
     hashtags?: string[];
   }) => {
     if (!user) {
@@ -135,8 +132,7 @@ export function useJournalEntries() {
       title?: string;
       content?: string;
       is_private?: boolean;
-      is_anonymous?: boolean;
-      mood?: "great" | "good" | "okay" | "low" | "difficult";
+          mood?: "great" | "good" | "okay" | "low" | "difficult";
       hashtags?: string[];
     }
   ) => {
