@@ -35,7 +35,7 @@ function mapPost(post: any): JournalEntry {
     is_private: post.privacy === "private",
     mood: post.mood ?? "okay",
     hashtags: post.tags
-      ? post.tags.split(",").map((t: string) => t.trim()).filter(Boolean)
+      ? post.tags.split(",").map((t: string) => t.trim().replace(/^#+/, '')).filter(Boolean)
       : [],
     likes: 0,
     comments: 0,

@@ -38,9 +38,8 @@ export const CreateJournal = ({ onSubmit }: CreateJournalProps) => {
         new Set(
           hashtagsInput
             .split(/[\s,]+/)
-            .map((t) => t.trim())
+            .map((t) => t.trim().replace(/^#+/, ''))
             .filter(Boolean)
-            .map((t) => (t.startsWith("#") ? t : `#${t}`))
         )
       );
       onSubmit({

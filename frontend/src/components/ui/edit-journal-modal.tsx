@@ -51,7 +51,7 @@ export const EditJournalModal = ({ open, onOpenChange, entry, onSave }: EditJour
     try {
       const hashtags = hashtagInput
         .split(',')
-        .map(tag => tag.trim())
+        .map(tag => tag.trim().replace(/^#+/, ''))
         .filter(tag => tag.length > 0);
 
       await onSave({
