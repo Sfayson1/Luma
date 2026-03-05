@@ -37,7 +37,7 @@ export const CreateJournal = ({ onSubmit }: CreateJournalProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (title.trim() && content.trim()) {
+    if (content.trim()) {
       const tags = Array.from(
         new Set(
           hashtagsInput
@@ -74,7 +74,7 @@ export const CreateJournal = ({ onSubmit }: CreateJournalProps) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Input
-              placeholder="What's on your mind today?"
+              placeholder="Title (optional)"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="border-[hsl(var(--color-border)_/_0.5)] focus:ring-[hsl(var(--color-primary)_/_0.2)] focus:border-[hsl(var(--color-primary))] transition-[var(--transition-gentle)]"
@@ -201,7 +201,7 @@ export const CreateJournal = ({ onSubmit }: CreateJournalProps) => {
           <Button
             type="submit"
             className="w-full bg-[linear-gradient(to_right,hsl(var(--color-primary)),hsl(var(--color-healing)))] hover:bg-[linear-gradient(to_right,hsl(var(--color-primary)_/_0.9),hsl(var(--color-healing)_/_0.9))] text-[hsl(var(--color-primary-foreground))] shadow-[var(--shadow-gentle)] hover:shadow-[var(--shadow-warm)] transition-[var(--transition-gentle)] disabled:opacity-50"
-            disabled={!title.trim() || !content.trim()}
+            disabled={!content.trim()}
           >
             Share Your Journey
           </Button>

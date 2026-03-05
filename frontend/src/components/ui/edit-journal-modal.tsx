@@ -90,13 +90,12 @@ export const EditJournalModal = ({ open, onOpenChange, entry, onSave }: EditJour
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Title */}
           <div className="space-y-2">
-            <Label htmlFor="title">Title</Label>
+            <Label htmlFor="title">Title (optional)</Label>
             <Input
               id="title"
               value={formData.title}
               onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
               placeholder="Give your entry a title..."
-              required
             />
           </div>
 
