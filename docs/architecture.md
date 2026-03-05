@@ -4,113 +4,125 @@
 
 ```mermaid
 graph TD
-    User["User (Browser)"]
+    User(["User (Browser)"])
 
-    subgraph Frontend ["Frontend — Vercel"]
-        Landing["Landing Page"]
-        Auth["Auth Pages\n(Login / Sign Up)"]
-        Dashboard["Dashboard\n(Journal, Analytics)"]
+    subgraph Vercel ["Frontend — Vercel (React + Vite)"]
+        direction TB
+        Landing["Landing / Demo"]
+        Auth["Auth\nLogin · Sign Up"]
+        Dashboard["Dashboard\nJournal · Analytics"]
         Settings["Settings"]
-        Demo["Demo Mode\n(no API calls)"]
     end
 
-    subgraph Backend ["Backend — Render (FastAPI)"]
-        AuthRouter["/api/auth\nregister · login · me"]
-        PostsRouter["/api/posts\nCRUD (user-scoped)"]
-        PromptsRouter["/api/prompts\nprompt-of-the-day"]
-        UsersRouter["/api/users"]
+    subgraph Render ["Backend — Render (FastAPI + Uvicorn)"]
+        direction TB
+        AuthAPI["POST /api/auth/login\nPOST /api/auth/register\nGET  /api/auth/me"]
+        PostsAPI["GET    /api/posts/\nPOST   /api/posts/\nPUT    /api/posts/:id\nDELETE /api/posts/:id"]
+        PromptsAPI["GET /api/prompts/prompt-of-the-day\n(static list — no DB call)"]
     end
 
-    subgraph Data ["Data Layer"]
-        DB[("PostgreSQL\n(Neon)")]
+    subgraph Neon ["Data — Neon (PostgreSQL)"]
+        DB[("users\nposts\nprompts")]
     end
 
     User --> Landing
     User --> Auth
     User --> Dashboard
     User --> Settings
-    User --> Demo
 
-    Auth -->|JWT token| AuthRouter
-    Dashboard -->|Bearer token| PostsRouter
-    Dashboard -->|Bearer token| PromptsRouter
-    Settings -->|Bearer token| AuthRouter
+    Auth      -- "email + password" --> AuthAPI
+    Dashboard -- "Bearer JWT"        --> PostsAPI
+    Dashboard -- "no auth required"  --> PromptsAPI
+    Settings  -- "Bearer JWT"        --> AuthAPI
 
-    AuthRouter --> DB
-    PostsRouter --> DB
-    UsersRouter --> DB
-    PromptsRouter -.->|static list\nno DB| PromptsRouter
+    AuthAPI   --> DB
+    PostsAPI  --> DB
 ```
 
-## Request Flow
+---
+
+## Request / Response Flow
 
 ```mermaid
 sequenceDiagram
-    participant B as Browser
-    participant V as Vercel (React SPA)
-    participant R as Render (FastAPI)
-    participant DB as Neon (Postgres)
+    actor U as User
+    participant FE as Vercel (React SPA)
+    participant BE as Render (FastAPI)
+    participant DB as Neon (PostgreSQL)
 
-    B->>V: GET /dashboard
-    V-->>B: index.html + JS bundle
+    U->>FE: Navigate to /dashboard
+    FE-->>U: index.html + JS bundle (cached by CDN)
 
-    B->>R: POST /api/auth/login
-    R->>DB: SELECT user WHERE email=...
-    DB-->>R: User row
-    R-->>B: { access_token }
+    U->>BE: POST /api/auth/login { email, password }
+    BE->>DB: SELECT * FROM users WHERE email = ?
+    DB-->>BE: user row
+    BE-->>U: { access_token: "eyJ..." }
 
-    B->>R: GET /api/posts/ (Bearer token)
-    R->>DB: SELECT posts WHERE owner_id=...
-    DB-->>R: posts[]
-    R-->>B: PostOutWithUser[]
+    Note over U,FE: Token stored in localStorage
 
-    B->>R: GET /api/prompts/prompt-of-the-day
-    R-->>B: { id, content, date } (no DB hit)
+    U->>BE: GET /api/posts/  [Authorization: Bearer eyJ...]
+    BE->>BE: Validate JWT → resolve user_id
+    BE->>DB: SELECT * FROM posts WHERE owner_id = ?
+    DB-->>BE: posts[]
+    BE-->>U: PostOutWithUser[]
+
+    U->>BE: GET /api/prompts/prompt-of-the-day
+    BE-->>U: { content: "...", date_created: "..." }
+    Note over BE: Computed from static list using<br/>today.toordinal() % len(PROMPTS)<br/>No database query needed
 ```
+
+---
 
 ## Authentication Flow
 
 ```mermaid
-flowchart LR
-    A[Sign Up / Login] --> B[FastAPI returns JWT]
-    B --> C[Stored in localStorage]
-    C --> D[Every apiFetch adds\nAuthorization: Bearer token]
-    D --> E[get_current_user dependency\nvalidates on each request]
-    E -->|valid| F[Route handler runs]
-    E -->|invalid / expired| G[401 Unauthorized]
-    G --> H[Frontend clears token\nredirects to /login]
+flowchart TD
+    A([User submits login form]) --> B[POST /api/auth/login]
+    B --> C{Credentials valid?}
+    C -- No --> D[401 Unauthorized]
+    D --> A
+    C -- Yes --> E[FastAPI signs JWT\nHS256 · 7-day expiry]
+    E --> F[Token stored in localStorage]
+    F --> G[apiFetch attaches\nAuthorization: Bearer token\nto every request]
+    G --> H{Token valid on\neach protected route?}
+    H -- Yes --> I[get_current_user resolves\nUser from DB · handler runs]
+    H -- Expired / Invalid --> J[401 Unauthorized]
+    J --> K[AuthContext clears token]
+    K --> L([Redirect to /login])
 ```
+
+---
 
 ## Data Model
 
 ```mermaid
 erDiagram
     USER {
-        int id PK
-        string username
-        string first_name
-        string last_name
-        string email
-        string hashed_password
+        int     id             PK
+        string  username       "unique"
+        string  first_name
+        string  last_name
+        string  email          "unique"
+        string  hashed_password
     }
 
     POST {
-        int id PK
-        text content
-        date date_posted
-        string mood
-        string privacy
-        string tags
-        int owner_id FK
-        int prompt_id FK
+        int     id             PK
+        text    content
+        date    date_posted
+        string  mood           "great|good|okay|low|difficult"
+        string  privacy        "private (default)"
+        string  tags           "comma-separated"
+        int     owner_id       FK
+        int     prompt_id      FK "nullable"
     }
 
     PROMPT {
-        int id PK
-        string content
-        date date_created
+        int     id             PK
+        string  content
+        date    date_created
     }
 
-    USER ||--o{ POST : "writes"
-    PROMPT ||--o{ POST : "inspires"
+    USER   ||--o{ POST   : "owns"
+    PROMPT ||--o{ POST   : "referenced by"
 ```
