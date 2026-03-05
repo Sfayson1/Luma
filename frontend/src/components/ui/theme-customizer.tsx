@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Palette, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -198,13 +198,21 @@ const themes = [
 export function ThemeCustomizer() {
   const [selectedTheme, setSelectedTheme] = useState("Default")
 
+  useEffect(() => {
+    const saved = localStorage.getItem("luma-theme")
+    if (saved) {
+      const theme = themes.find(t => t.name === saved)
+      if (theme) applyTheme(theme)
+    }
+  }, [])
+
   const applyTheme = (theme: typeof themes[0]) => {
     const root = document.documentElement
     const isDark = root.classList.contains("dark")
     const themeVars = isDark ? theme.cssVars.dark : theme.cssVars.light
 
     Object.entries(themeVars).forEach(([property, value]) => {
-      root.style.setProperty(`--${property}`, value)
+      root.style.setProperty(`--color-${property}`, value)
     })
 
     setSelectedTheme(theme.name)
