@@ -15,7 +15,7 @@ export function useDemoPosts() {
 
   const getPost = (id: number) => posts.find((p) => p.id === id) ?? null;
 
-  const createPost = (data: { title: string; content: string; mood: string; tags: string[] }) => {
+  const createPost = (data: { title: string; content: string; mood: Post['mood']; tags: string[] }) => {
     const newPost: Post = {
       id: nextId++,
       ...data,
