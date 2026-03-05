@@ -25,7 +25,6 @@ interface CreateJournalProps {
 }
 
 export const CreateJournal = ({ onSubmit }: CreateJournalProps) => {
-  const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [mood, setMood] = useState<
     "great" | "good" | "okay" | "low" | "difficult"
@@ -45,14 +44,13 @@ export const CreateJournal = ({ onSubmit }: CreateJournalProps) => {
         )
       );
       onSubmit({
-        title: title.trim(),
+        title: "",
         content: content.trim(),
         isPrivate: true,
         isAnonymous: false,
         mood,
         hashtags: tags,
       });
-      setTitle("");
       setContent("");
       setHashtagsInput("");
     }
@@ -69,15 +67,6 @@ export const CreateJournal = ({ onSubmit }: CreateJournalProps) => {
 
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Input
-              placeholder="Title (optional)"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="border-[hsl(var(--color-border)_/_0.5)] focus:ring-[hsl(var(--color-primary)_/_0.2)] focus:border-[hsl(var(--color-primary))] transition-[var(--transition-gentle)]"
-            />
-          </div>
-
           <div>
             <Textarea
               placeholder="Express your thoughts and feelings..."

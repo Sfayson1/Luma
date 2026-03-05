@@ -22,7 +22,6 @@ interface EditJournalModalProps {
 
 export const EditJournalModal = ({ open, onOpenChange, entry, onSave }: EditJournalModalProps) => {
   const [formData, setFormData] = useState({
-    title: '',
     content: '',
     mood: 'okay' as 'great' | 'good' | 'okay' | 'low' | 'difficult',
     hashtags: [] as string[]
@@ -34,7 +33,6 @@ export const EditJournalModal = ({ open, onOpenChange, entry, onSave }: EditJour
   useEffect(() => {
     if (entry) {
       setFormData({
-        title: entry.title,
         content: entry.content,
         mood: entry.mood,
         hashtags: entry.hashtags || []
@@ -43,9 +41,11 @@ export const EditJournalModal = ({ open, onOpenChange, entry, onSave }: EditJour
     }
   }, [entry]);
 
+  const hasContent = formData.content.replace(/<[^>]*>/g, '').trim().length > 0;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title.trim() || !formData.content.trim()) return;
+    if (!hasContent) return;
 
     setIsSubmitting(true);
     try {
@@ -55,6 +55,7 @@ export const EditJournalModal = ({ open, onOpenChange, entry, onSave }: EditJour
         .filter(tag => tag.length > 0);
 
       await onSave({
+        title: '',
         ...formData,
         hashtags
       });
@@ -84,17 +85,6 @@ export const EditJournalModal = ({ open, onOpenChange, entry, onSave }: EditJour
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Title */}
-          <div className="space-y-2">
-            <Label htmlFor="title">Title (optional)</Label>
-            <Input
-              id="title"
-              value={formData.title}
-              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-              placeholder="Give your entry a title..."
-            />
-          </div>
-
           {/* Content */}
           <div className="space-y-2">
             <Label htmlFor="content">Content</Label>
@@ -169,7 +159,7 @@ export const EditJournalModal = ({ open, onOpenChange, entry, onSave }: EditJour
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting || !formData.title.trim() || !formData.content.trim()}
+              disabled={isSubmitting || !hasContent}
               className="gap-2"
             >
               <Save className="h-4 w-4" />

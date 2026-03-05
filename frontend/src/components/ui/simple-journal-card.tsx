@@ -119,8 +119,6 @@ export const SimpleJournalCard = ({ entry, onEdit, onDelete, showManagement = fa
                 </div>
               </div>
 
-              <h3 className="font-semibold text-[hsl(var(--color-foreground))] mb-2">{entry.title}</h3>
-
               <div
                 className="text-[hsl(var(--color-foreground))] text-sm leading-relaxed mb-3 prose prose-sm max-w-none"
                 dangerouslySetInnerHTML={{ __html: entry.content }}
