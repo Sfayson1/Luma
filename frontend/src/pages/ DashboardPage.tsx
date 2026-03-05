@@ -11,7 +11,6 @@ import { MoodAnalytics } from '../components/ui/mood-analytics';
 import { useJournalEntries } from '../hooks/useJournalEntries';
 import { useAuth } from '../hooks/useAuth';
 import {
-  Heart,
   TrendingUp,
   Calendar,
   Lightbulb,
@@ -240,18 +239,6 @@ const dailyPrompts = [
                 <p className="text-xs text-[hsl(var(--color-muted-foreground))] mt-1">
                   {30 - userStreak} days to 30-day milestone
                 </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card  style={{ border: '1px solid hsl(var(--color-border))', borderLeft: '4px solid hsl(200 80% 50%)' }}>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-[hsl(var(--color-muted-foreground))]">Community Support</p>
-                  <p className="text-2xl font-bold text-[hsl(var(--color-foreground))]">{totalLikes}</p>
-                </div>
-                <Heart className="h-5 w-5 text-[hsl(200_80%_50%)]" />
               </div>
             </CardContent>
           </Card>
