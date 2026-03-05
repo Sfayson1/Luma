@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
-import { Badge } from './badge';
-import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { JournalEntry } from '@/hooks/useJournalEntries';
-import { TrendingUp, TrendingDown, Calendar, Heart, Brain, Target } from 'lucide-react';
+import { TrendingUp, TrendingDown, Calendar, Heart, Brain, Target, Tag, Flame } from 'lucide-react';
 
 interface MoodAnalyticsProps {
   entries: JournalEntry[];
@@ -116,6 +115,60 @@ export const MoodAnalytics = ({ entries }: MoodAnalyticsProps) => {
 
     const moodTrend = currentMoodAvg - previousMoodAvg;
 
+    // Writing patterns by day of week
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const dayCountsMap = new Array(7).fill(0);
+    entries.forEach(entry => {
+      const d = new Date(entry.created_at);
+      dayCountsMap[d.getDay()]++;
+    });
+    const writingPatterns = dayNames.map((day, i) => ({ day, count: dayCountsMap[i] }));
+
+    // Tag usage (top 8)
+    const tagCountsMap: Record<string, number> = {};
+    entries.forEach(entry => {
+      (entry.hashtags || []).forEach(tag => {
+        tagCountsMap[tag] = (tagCountsMap[tag] || 0) + 1;
+      });
+    });
+    const tagUsage = Object.entries(tagCountsMap)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8)
+      .map(([tag, count]) => ({ tag, count }));
+
+    // Streak history — last 12 weeks (84 days) as flat array
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const streakHistory = Array.from({ length: 84 }, (_, i) => {
+      const d = new Date(today);
+      d.setDate(d.getDate() - (83 - i));
+      const dateStr = d.toISOString().split('T')[0];
+      const count = entries.filter(e => e.created_at.split('T')[0] === dateStr).length;
+      return { date: dateStr, count, day: d.getDay() };
+    });
+
+    // Current streak (consecutive days ending today)
+    let currentStreak = 0;
+    for (let i = 83; i >= 0; i--) {
+      if (streakHistory[i].count > 0) currentStreak++;
+      else break;
+    }
+
+    // Longest streak
+    let longestStreak = 0;
+    let running = 0;
+    streakHistory.forEach(d => {
+      if (d.count > 0) { running++; longestStreak = Math.max(longestStreak, running); }
+      else running = 0;
+    });
+
+    // Best writing day
+    const bestDayIndex = dayCountsMap.indexOf(Math.max(...dayCountsMap));
+    const bestDay = dayNames[bestDayIndex];
+
+    // Most used tag
+    const topTag = tagUsage[0]?.tag ?? null;
+
     return {
       dailyMoods: dailyMoods.filter(d => d.mood !== null),
       moodDistribution,
@@ -123,7 +176,14 @@ export const MoodAnalytics = ({ entries }: MoodAnalyticsProps) => {
       currentMoodAvg: Math.round(currentMoodAvg * 10) / 10,
       moodTrend: Math.round(moodTrend * 10) / 10,
       totalEntries: entries.length,
-      averageMood: Math.round((entries.reduce((sum, entry) => sum + moodValues[entry.mood], 0) / entries.length) * 10) / 10
+      averageMood: Math.round((entries.reduce((sum, entry) => sum + moodValues[entry.mood], 0) / entries.length) * 10) / 10,
+      writingPatterns,
+      tagUsage,
+      streakHistory,
+      currentStreak,
+      longestStreak,
+      bestDay,
+      topTag,
     };
   }, [entries]);
 
@@ -146,7 +206,7 @@ export const MoodAnalytics = ({ entries }: MoodAnalyticsProps) => {
   return (
     <div className="space-y-6">
       {/* Overview Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card style={{ border: '1px solid hsl(var(--color-primary) / 0.2)' }}>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
@@ -166,7 +226,7 @@ export const MoodAnalytics = ({ entries }: MoodAnalyticsProps) => {
                 analytics.moodTrend > 0 ? 'text-[hsl(142_69%_53%)]' :
                 analytics.moodTrend < 0 ? 'text-[hsl(0_84%_55%)]' : 'text-[hsl(var(--color-muted-foreground))]'
               }`}>
-                {analytics.moodTrend > 0 ? '+' : ''}{analytics.moodTrend} vs last 10 entries
+                {analytics.moodTrend > 0 ? '+' : ''}{analytics.moodTrend} vs prev 10
               </span>
             </div>
           </CardContent>
@@ -191,14 +251,14 @@ export const MoodAnalytics = ({ entries }: MoodAnalyticsProps) => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-[hsl(var(--color-muted-foreground))]">Best Mood</p>
-                <p className="text-2xl font-bold text-[hsl(var(--color-foreground))]">
-                  {analytics.moodDistribution.find(m => m.mood === 'Great')?.count || 0}
-                </p>
+                <p className="text-sm font-medium text-[hsl(var(--color-muted-foreground))]">Current Streak</p>
+                <p className="text-2xl font-bold text-[hsl(var(--color-foreground))]">{analytics.currentStreak}</p>
               </div>
-              <div className="w-3 h-3 rounded-full bg-[hsl(142_69%_58%)]" />
+              <Flame className="h-5 w-5 text-[hsl(25_95%_55%)]" />
             </div>
-            <p className="text-sm text-[hsl(var(--color-muted-foreground))] mt-2">Great days</p>
+            <p className="text-sm text-[hsl(var(--color-muted-foreground))] mt-2">
+              Best: {analytics.longestStreak} days
+            </p>
           </CardContent>
         </Card>
 
@@ -343,6 +403,112 @@ export const MoodAnalytics = ({ entries }: MoodAnalyticsProps) => {
         </Card>
       </div>
 
+      {/* Streak History */}
+      <Card style={{ border: '1px solid hsl(var(--color-primary) / 0.2)' }}>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Flame className="h-5 w-5 text-[hsl(25_95%_55%)]" />
+            Streak History (Last 12 Weeks)
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-1 flex-wrap">
+            {analytics.streakHistory.map((day, i) => (
+              <div
+                key={i}
+                title={`${day.date}: ${day.count} ${day.count === 1 ? 'entry' : 'entries'}`}
+                className="w-3 h-3 rounded-sm"
+                style={{
+                  backgroundColor: day.count === 0
+                    ? 'hsl(var(--color-border))'
+                    : day.count === 1
+                    ? 'hsl(var(--color-primary) / 0.4)'
+                    : 'hsl(var(--color-primary))'
+                }}
+              />
+            ))}
+          </div>
+          <div className="flex items-center gap-4 mt-3 text-xs text-[hsl(var(--color-muted-foreground))]">
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 rounded-sm bg-[hsl(var(--color-border))]" />
+              <span>No entry</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: 'hsl(var(--color-primary) / 0.4)' }} />
+              <span>1 entry</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: 'hsl(var(--color-primary))' }} />
+              <span>2+ entries</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Writing Patterns */}
+        <Card style={{ border: '1px solid hsl(var(--color-primary) / 0.2)' }}>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5" />
+              Writing Patterns
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={analytics.writingPatterns}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--color-border))" />
+                <XAxis dataKey="day" stroke="hsl(var(--color-muted-foreground))" fontSize={12} />
+                <YAxis allowDecimals={false} stroke="hsl(var(--color-muted-foreground))" fontSize={12} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--color-background))',
+                    border: '1px solid hsl(var(--color-border))',
+                    borderRadius: '8px'
+                  }}
+                  formatter={(value: number) => [value, 'Entries']}
+                />
+                <Bar dataKey="count" fill="hsl(var(--color-healing))" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Tag Usage */}
+        <Card style={{ border: '1px solid hsl(var(--color-primary) / 0.2)' }}>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Tag className="h-5 w-5" />
+              Top Tags
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {analytics.tagUsage.length === 0 ? (
+              <div className="flex items-center justify-center h-[220px] text-[hsl(var(--color-muted-foreground))] text-sm">
+                No tags used yet
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={analytics.tagUsage} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--color-border))" />
+                  <XAxis type="number" allowDecimals={false} stroke="hsl(var(--color-muted-foreground))" fontSize={12} />
+                  <YAxis type="category" dataKey="tag" stroke="hsl(var(--color-muted-foreground))" fontSize={12} width={70} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--color-background))',
+                      border: '1px solid hsl(var(--color-border))',
+                      borderRadius: '8px'
+                    }}
+                    formatter={(value: number) => [value, 'Uses']}
+                  />
+                  <Bar dataKey="count" fill="hsl(var(--color-primary))" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Insights */}
       <Card style={{ border: '1px solid hsl(var(--color-primary) / 0.2)' }}>
         <CardHeader>
@@ -352,40 +518,64 @@ export const MoodAnalytics = ({ entries }: MoodAnalyticsProps) => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-3">
             {analytics.moodTrend > 0.5 && (
-              <div className="flex items-start gap-3 p-3 bg-[hsl(142_69%_95%)]  border-[hsl(142_69%_80%)] rounded-lg">
-                <TrendingUp className="h-5 w-5 text-[hsl(142_69%_40%)] mt-0.5" />
+              <div className="flex items-start gap-3 p-3 bg-[hsl(142_69%_95%)] rounded-lg">
+                <TrendingUp className="h-5 w-5 text-[hsl(142_69%_40%)] mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-medium text-[hsl(142_69%_25%)]">Positive Trend</p>
+                  <p className="font-medium text-[hsl(142_69%_25%)]">Mood Improving</p>
                   <p className="text-sm text-[hsl(142_69%_30%)]">
-                    Your recent mood has been improving! Your last 10 entries show a {analytics.moodTrend.toFixed(1)} point increase.
+                    Your last 10 entries are {analytics.moodTrend.toFixed(1)} points higher than the previous 10. Keep it up!
                   </p>
                 </div>
               </div>
             )}
 
             {analytics.moodTrend < -0.5 && (
-              <div className="flex items-start gap-3 p-3 bg-[hsl(45_100%_95%)]  border-[hsl(45_100%_80%)] rounded-lg">
-                <TrendingDown className="h-5 w-5 text-[hsl(45_100%_40%)] mt-0.5" />
+              <div className="flex items-start gap-3 p-3 bg-[hsl(45_100%_95%)] rounded-lg">
+                <TrendingDown className="h-5 w-5 text-[hsl(45_100%_35%)] mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-medium text-[hsl(45_100%_25%)]">Consider Support</p>
+                  <p className="font-medium text-[hsl(45_100%_25%)]">Mood Dipping</p>
                   <p className="text-sm text-[hsl(45_100%_30%)]">
-                    Your recent mood has been declining. Consider reaching out to friends, family, or a mental health professional.
+                    Your mood has dropped {Math.abs(analytics.moodTrend).toFixed(1)} points recently. Be gentle with yourself and consider reaching out for support.
                   </p>
                 </div>
               </div>
             )}
 
-            <div className="flex items-start gap-3 p-3 bg-[hsl(200_80%_95%)] border-[hsl(200_80%_80%)] rounded-lg">
-              <Target className="h-5 w-5 text-[hsl(200_80%_40%)] mt-0.5" />
+            {analytics.currentStreak >= 3 && (
+              <div className="flex items-start gap-3 p-3 bg-[hsl(25_95%_95%)] rounded-lg">
+                <Flame className="h-5 w-5 text-[hsl(25_95%_45%)] mt-0.5 shrink-0" />
+                <div>
+                  <p className="font-medium text-[hsl(25_95%_25%)]">{analytics.currentStreak}-Day Streak</p>
+                  <p className="text-sm text-[hsl(25_95%_30%)]">
+                    You've journaled {analytics.currentStreak} days in a row.{analytics.currentStreak === analytics.longestStreak ? ' That\'s your personal best!' : ` Your longest streak is ${analytics.longestStreak} days — you're on your way!`}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-start gap-3 p-3 bg-[hsl(var(--color-serenity)_/_0.4)] rounded-lg">
+              <Calendar className="h-5 w-5 text-[hsl(var(--color-primary))] mt-0.5 shrink-0" />
               <div>
-                <p className="font-medium text-[hsl(200_80%_25%)]">Consistency Insight</p>
-                <p className="text-sm text-[hsl(200_80%_30%)]">
-                  You've been journaling consistently! Regular reflection can help you better understand your emotional patterns.
+                <p className="font-medium text-[hsl(var(--color-foreground))]">You write most on {analytics.bestDay}s</p>
+                <p className="text-sm text-[hsl(var(--color-muted-foreground))]">
+                  Consider setting a reminder for the rest of the week to build a consistent habit.
                 </p>
               </div>
             </div>
+
+            {analytics.topTag && (
+              <div className="flex items-start gap-3 p-3 bg-[hsl(200_80%_95%)] rounded-lg">
+                <Tag className="h-5 w-5 text-[hsl(200_80%_40%)] mt-0.5 shrink-0" />
+                <div>
+                  <p className="font-medium text-[hsl(200_80%_25%)]">Top theme: #{analytics.topTag}</p>
+                  <p className="text-sm text-[hsl(200_80%_30%)]">
+                    This tag appears most in your entries. It may reflect a recurring focus in your life right now.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

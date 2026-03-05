@@ -172,7 +172,6 @@ const dailyPrompts = [
   });
 
   const totalEntries = entries.length;
-  const totalLikes = entries.reduce((sum, entry) => sum + (entry.likes || 0), 0);
   const thisWeekEntries = entries.filter(entry => {
     const entryDate = new Date(entry.created_at);
     const weekAgo = new Date();
@@ -214,7 +213,7 @@ const dailyPrompts = [
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
           <Card style={{ border: '1px solid hsl(var(--color-border))', borderLeft: '4px solid hsl(var(--color-primary))'  }}>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
