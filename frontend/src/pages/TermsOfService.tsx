@@ -51,11 +51,10 @@ export default function TermsOfService() {
 
             <h3 className="text-xl font-medium text-gray-800 mb-3">What You Can Do</h3>
             <ul className="list-disc list-inside text-gray-700 mb-6 space-y-1">
-              <li>Create personal journal entries</li>
-              <li>Set entries as private or public</li>
-              <li>Share public entries with the community</li>
-              <li>Customize your profile and preferences</li>
-              <li>Use all features as intended</li>
+              <li>Create and manage personal journal entries</li>
+              <li>Track your mood and emotional patterns</li>
+              <li>Use all journaling features as intended</li>
+              <li>Customize your display and preferences</li>
             </ul>
 
             <h3 className="text-xl font-medium text-gray-800 mb-3">What You Cannot Do</h3>
@@ -75,9 +74,9 @@ export default function TermsOfService() {
 
             <h3 className="text-xl font-medium text-gray-800 mb-3">Content You Create</h3>
             <ul className="list-disc list-inside text-gray-700 mb-6 space-y-1">
-              <li>You own your journal entries and profile content</li>
-              <li>You grant us permission to store and display your content</li>
-              <li>Public entries may be visible to other users</li>
+              <li>You own your journal entries</li>
+              <li>You grant us permission to store your content securely</li>
+              <li>All entries are private and visible only to you</li>
               <li>You can delete your content anytime</li>
             </ul>
 
@@ -99,24 +98,10 @@ export default function TermsOfService() {
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Community Guidelines</h2>
-
-            <h3 className="text-xl font-medium text-gray-800 mb-3">Respectful Interaction</h3>
-            <ul className="list-disc list-inside text-gray-700 mb-6 space-y-1">
-              <li>Be kind and respectful to other users</li>
-              <li>Respect others' privacy and boundaries</li>
-              <li>Support mental health and wellbeing</li>
-              <li>Report inappropriate behavior</li>
-            </ul>
-
-            <h3 className="text-xl font-medium text-gray-800 mb-3">Public Sharing</h3>
-            <p className="text-gray-700 mb-3">When sharing entries publicly:</p>
-            <ul className="list-disc list-inside text-gray-700 space-y-1">
-              <li>Consider the impact on others</li>
-              <li>Don't share others' personal information</li>
-              <li>Be mindful of sensitive content</li>
-              <li>Use appropriate tags and warnings</li>
-            </ul>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Your Privacy</h2>
+            <p className="text-gray-700">
+              Luma is a private journaling platform. Your entries are visible only to you and are never shared with other users. We are committed to keeping your personal reflections secure and confidential.
+            </p>
           </section>
 
           <section className="mb-8">
@@ -169,9 +154,8 @@ export default function TermsOfService() {
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">Contact Information</h2>
             <p className="text-gray-700 mb-3">Questions about these Terms?</p>
             <ul className="list-disc list-inside text-gray-700 space-y-1">
-              <li><strong>Email:</strong> legal@luma-app.com</li>
-              <li><strong>Support:</strong> support@luma-app.com</li>
-              <li><strong>Address:</strong> [Your Business Address]</li>
+              <li><strong>Email:</strong> legal@lumajournal.com</li>
+              <li><strong>Support:</strong> support@lumajournal.com</li>
             </ul>
           </section>
 

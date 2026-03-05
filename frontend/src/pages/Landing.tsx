@@ -99,8 +99,8 @@ const Landing = () => {
             Ready to reflect?
           </h2>
           <p className="text-lg md:text-xl text-[hsl(var(--color-muted-foreground))] mb-10 max-w-2xl mx-auto">
-            Join our mindful community today and start your journey towards a
-            calmer, more reflective self.
+            Your thoughts, your space. Start building a private journaling
+            habit that actually sticks.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link to="/auth">

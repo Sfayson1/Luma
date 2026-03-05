@@ -23,8 +23,7 @@ export default function PrivacyPolicy() {
             <h3 className="text-xl font-medium text-gray-800 mb-3">Personal Information</h3>
             <ul className="list-disc list-inside text-gray-700 mb-6 space-y-1">
               <li><strong>Account Information:</strong> Email address, name, username</li>
-              <li><strong>Profile Information:</strong> Profile photo, bio, preferences</li>
-              <li><strong>Journal Content:</strong> Your journal entries, mood tracking, tags, and prompts</li>
+              <li><strong>Journal Content:</strong> Your journal entries, mood tracking, and tags</li>
             </ul>
 
             <h3 className="text-xl font-medium text-gray-800 mb-3">Automatically Collected Information</h3>
@@ -41,7 +40,7 @@ export default function PrivacyPolicy() {
             <ul className="list-disc list-inside text-gray-700 space-y-1">
               <li>Provide and maintain the Luma service</li>
               <li>Enable you to create and manage journal entries</li>
-              <li>Facilitate social features (sharing public entries)</li>
+              <li>Provide analytics and insights from your own entries</li>
               <li>Send important service notifications</li>
               <li>Improve our app and user experience</li>
               <li>Ensure security and prevent abuse</li>
@@ -63,7 +62,6 @@ export default function PrivacyPolicy() {
               <li><strong>Legal Requirements:</strong> Court orders, legal process</li>
               <li><strong>Safety:</strong> To prevent harm to users or others</li>
               <li><strong>Business Transfer:</strong> If ownership changes (with notice)</li>
-              <li><strong>Public Content:</strong> Entries you choose to make public</li>
             </ul>
           </section>
 
@@ -71,19 +69,11 @@ export default function PrivacyPolicy() {
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">Your Privacy Controls</h2>
 
             <h3 className="text-xl font-medium text-gray-800 mb-3">You Can</h3>
-            <ul className="list-disc list-inside text-gray-700 mb-6 space-y-1">
-              <li>Set journal entries to private or public</li>
-              <li>Edit or delete your journal entries anytime</li>
-              <li>Update your profile information</li>
-              <li>Request account deletion</li>
-              <li>Download your data</li>
-            </ul>
-
-            <h3 className="text-xl font-medium text-gray-800 mb-3">Privacy Settings</h3>
             <ul className="list-disc list-inside text-gray-700 space-y-1">
-              <li><strong>Private Entries:</strong> Only visible to you</li>
-              <li><strong>Public Entries:</strong> Visible to other Luma users</li>
-              <li><strong>Profile Privacy:</strong> Control who can see your profile</li>
+              <li>Edit or delete your journal entries anytime</li>
+              <li>Update your account information</li>
+              <li>Change your password at any time</li>
+              <li>Request account deletion</li>
             </ul>
           </section>
 
@@ -128,8 +118,7 @@ export default function PrivacyPolicy() {
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">Contact Us</h2>
             <p className="text-gray-700 mb-3">If you have questions about this Privacy Policy or your data:</p>
             <ul className="list-disc list-inside text-gray-700 space-y-1">
-              <li><strong>Email:</strong> privacy@luma-app.com</li>
-              <li><strong>Address:</strong> [Your Business Address]</li>
+              <li><strong>Email:</strong> privacy@lumajournal.com</li>
             </ul>
           </section>
 

@@ -126,15 +126,6 @@ class WebPushService {
     });
   }
 
-  async showLikeNotification(likerName: string, entryTitle: string): Promise<void> {
-    await this.showNotification({
-      title: '❤️ Someone liked your entry!',
-      body: `${likerName} liked "${entryTitle}"`,
-      tag: 'like-notification',
-      data: { likerName, entryTitle },
-    });
-  }
-
   async showAchievementNotification(achievement: string): Promise<void> {
     await this.showNotification({
       title: '🏆 Achievement Unlocked!',
