@@ -186,8 +186,9 @@ interface ProfileSettingsPageProps {
 }
 
 const ProfileSettingsPage: React.FC<ProfileSettingsPageProps> = ({ onBack }) => {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const { toast } = useToast();
+  const [saving, setSaving] = useState(false);
   const [profile, setProfile] = useState({
     firstName: user?.first_name || '',
     lastName: user?.last_name || '',
@@ -198,6 +199,26 @@ const ProfileSettingsPage: React.FC<ProfileSettingsPageProps> = ({ onBack }) => 
   });
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await apiFetch('/api/auth/me', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          first_name: profile.firstName,
+          last_name: profile.lastName,
+          email: profile.email,
+        }),
+      });
+      await refreshUser();
+      toast({ title: 'Profile updated successfully' });
+    } catch {
+      toast({ title: 'Error', description: 'Failed to update profile', variant: 'destructive' });
+    } finally {
+      setSaving(false);
+    }
+  };
 
 const handleAvatarUpload = async (_event: React.ChangeEvent<HTMLInputElement>) => {
   toast({ title: 'Not available', description: 'Avatar upload is not supported yet.', variant: 'destructive' });
@@ -334,7 +355,7 @@ const handleAvatarUpload = async (_event: React.ChangeEvent<HTMLInputElement>) =
           </CardContent>
         </Card>
 
-        <Button className="w-full bg-[hsl(var(--color-primary))] text-[hsl(var(--color-primary-foreground))] hover:bg-[hsl(var(--color-primary)_/_0.9)]">Save Changes</Button>
+        <Button onClick={handleSave} disabled={saving} className="w-full bg-[hsl(var(--color-primary))] text-[hsl(var(--color-primary-foreground))] hover:bg-[hsl(var(--color-primary)_/_0.9)]">{saving ? 'Saving...' : 'Save Changes'}</Button>
       </div>
     </div>
   );
