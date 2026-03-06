@@ -167,6 +167,7 @@ const AuthPage = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Enter your password"
+                        autoComplete="current-password"
                         required
                       />
                       <Button
@@ -231,6 +232,7 @@ const AuthPage = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Create a password (min. 6 characters)"
+                        autoComplete="new-password"
                         required
                         minLength={6}
                       />
