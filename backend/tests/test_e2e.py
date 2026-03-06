@@ -1,5 +1,5 @@
 """
-End-to-end test: full user journey across auth, prompts, and posts routers.
+End-to-end test: full user journey across auth and posts routers.
 Simulates the flow a real user takes from sign-up to journaling.
 """
 
@@ -18,19 +18,13 @@ def test_full_user_journey(client):
     token = resp.json()["access_token"]
     headers = {"Authorization": f"Bearer {token}"}
 
-    # 2. Fetch today's reflection prompt
-    prompt_resp = client.get("/api/prompts/prompt-of-the-day", headers=headers)
-    assert prompt_resp.status_code == 200
-    prompt_id = prompt_resp.json()["id"]
-
-    # 3. Create a journal entry using the prompt
+    # 2. Create a journal entry
     create_resp = client.post(
         "/api/posts/",
         json={
             "content": "Today I reflected on what matters most.",
             "mood": "great",
             "tags": "reflection,gratitude",
-            "prompt_id": prompt_id,
         },
         headers=headers,
     )
@@ -38,15 +32,14 @@ def test_full_user_journey(client):
     post = create_resp.json()
     assert post["content"] == "Today I reflected on what matters most."
     assert post["mood"] == "great"
-    assert post["prompt_id"] == prompt_id
     post_id = post["id"]
 
-    # 4. Confirm the entry appears in the user's list
+    # 3. Confirm the entry appears in the user's list
     list_resp = client.get("/api/posts/", headers=headers)
     assert list_resp.status_code == 200
     assert any(p["id"] == post_id for p in list_resp.json())
 
-    # 5. Update the entry
+    # 4. Update the entry
     update_resp = client.put(
         f"/api/posts/{post_id}",
         json={"content": "Updated reflection.", "mood": "good"},
@@ -56,10 +49,10 @@ def test_full_user_journey(client):
     assert update_resp.json()["content"] == "Updated reflection."
     assert update_resp.json()["mood"] == "good"
 
-    # 6. Delete the entry
+    # 5. Delete the entry
     delete_resp = client.delete(f"/api/posts/{post_id}", headers=headers)
     assert delete_resp.status_code == 204
 
-    # 7. Confirm it's gone
+    # 6. Confirm it's gone
     final_list = client.get("/api/posts/", headers=headers)
     assert all(p["id"] != post_id for p in final_list.json())
