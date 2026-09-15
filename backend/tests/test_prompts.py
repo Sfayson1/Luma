@@ -4,7 +4,7 @@ All tests run without a database — the prompt-of-the-day endpoint
 uses a static in-memory list, making it fast and dependency-free.
 """
 
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 
 # Import the router directly and build a minimal app so we don't need
 # a running database or real environment variables.

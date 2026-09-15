@@ -1,4 +1,4 @@
-from datetime import date, timezone, datetime
+from datetime import date, datetime, timezone
 
 from fastapi import APIRouter
 from pydantic import BaseModel
