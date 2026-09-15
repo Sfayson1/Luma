@@ -1,6 +1,6 @@
 from datetime import date
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 # ========== Auth ==========
@@ -44,8 +44,7 @@ class UserOut(BaseModel):
     last_name: str
     email: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 # ========== Prompts ==========
 class PromptOut(BaseModel):
@@ -53,8 +52,7 @@ class PromptOut(BaseModel):
     content: str
     date_created: date
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 # ========== Posts ==========
 class PostIn(BaseModel):
@@ -77,8 +75,7 @@ class PostOut(BaseModel):
     owner_id: int
     prompt_id: int | None = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class PostOutWithUser(BaseModel):
     id: int
@@ -92,8 +89,7 @@ class PostOutWithUser(BaseModel):
     owner: UserOut
     prompt: PromptOut | None = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class PostUpdate(BaseModel):
     content: str | None = None
