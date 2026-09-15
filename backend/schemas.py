@@ -1,6 +1,7 @@
-from pydantic import BaseModel, EmailStr
-from typing import Optional
 from datetime import date
+
+from pydantic import BaseModel, EmailStr
+
 
 # ========== Auth ==========
 class Token(BaseModel):
@@ -8,7 +9,7 @@ class Token(BaseModel):
     token_type: str
 
 class TokenData(BaseModel):
-    email: Optional[str] = None
+    email: str | None = None
 
 class UserLogin(BaseModel):
     email: str
@@ -28,9 +29,9 @@ class UserCreate(BaseModel):
     password: str
 
 class UserUpdate(BaseModel):
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    email: Optional[str] = None
+    first_name: str | None = None
+    last_name: str | None = None
+    email: str | None = None
 
 class PasswordChange(BaseModel):
     current_password: str
@@ -58,10 +59,10 @@ class PromptOut(BaseModel):
 # ========== Posts ==========
 class PostIn(BaseModel):
     content: str
-    mood: Optional[str] = None
-    privacy: Optional[str] = "private"
-    tags: Optional[str] = None
-    prompt_id: Optional[int] = None
+    mood: str | None = None
+    privacy: str | None = "private"
+    tags: str | None = None
+    prompt_id: int | None = None
 
 class PostCreate(PostIn):
     pass
@@ -70,11 +71,11 @@ class PostOut(BaseModel):
     id: int
     content: str
     date_posted: date
-    mood: Optional[str] = None
+    mood: str | None = None
     privacy: str
-    tags: Optional[str] = None
+    tags: str | None = None
     owner_id: int
-    prompt_id: Optional[int] = None
+    prompt_id: int | None = None
 
     class Config:
         from_attributes = True
@@ -83,19 +84,19 @@ class PostOutWithUser(BaseModel):
     id: int
     content: str
     date_posted: date
-    mood: Optional[str] = None
+    mood: str | None = None
     privacy: str
-    tags: Optional[str] = None
+    tags: str | None = None
     owner_id: int
-    prompt_id: Optional[int] = None
+    prompt_id: int | None = None
     owner: UserOut
-    prompt: Optional[PromptOut] = None
+    prompt: PromptOut | None = None
 
     class Config:
         from_attributes = True
 
 class PostUpdate(BaseModel):
-    content: Optional[str] = None
-    mood: Optional[str] = None
-    privacy: Optional[str] = None
-    tags: Optional[str] = None
+    content: str | None = None
+    mood: str | None = None
+    privacy: str | None = None
+    tags: str | None = None

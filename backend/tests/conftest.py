@@ -19,8 +19,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from database import Base, get_db
 import models  # noqa: F401
+from database import Base, get_db
 from routers import auth, posts
 
 engine = create_engine(
