@@ -1,14 +1,14 @@
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
 from database import get_db
 from models import User
-from schemas import UserOut, UserLogin, UserRegister, Token, UserUpdate, PasswordChange
+from schemas import PasswordChange, Token, UserLogin, UserOut, UserRegister, UserUpdate
 from utils import hash_password, verify_password
 
 router = APIRouter()
@@ -26,7 +26,7 @@ if not SECRET_KEY:
 
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 

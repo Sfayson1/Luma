@@ -1,10 +1,11 @@
 from contextlib import asynccontextmanager
+
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import init_db
-from routers import posts, auth, prompts
+from routers import auth, posts, prompts
 
 load_dotenv()
 

@@ -4,13 +4,14 @@ All tests run without a database — the prompt-of-the-day endpoint
 uses a static in-memory list, making it fast and dependency-free.
 """
 
-from datetime import date
-from fastapi.testclient import TestClient
+from datetime import date, datetime, timezone
 
 # Import the router directly and build a minimal app so we don't need
 # a running database or real environment variables.
 from fastapi import FastAPI
-from routers.prompts import router, PROMPTS
+from fastapi.testclient import TestClient
+
+from routers.prompts import PROMPTS, router
 
 app = FastAPI()
 app.include_router(router, prefix="/api/prompts")
@@ -41,7 +42,7 @@ def test_prompt_content_is_non_empty_string():
 def test_prompt_date_is_today():
     response = client.get("/api/prompts/prompt-of-the-day")
     data = response.json()
-    assert data["date_created"] == date.today().isoformat()
+    assert data["date_created"] == datetime.now(timezone.utc).date().isoformat()
 
 
 def test_prompt_is_deterministic_same_day():
