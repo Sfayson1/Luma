@@ -1,10 +1,11 @@
 from contextlib import asynccontextmanager
+
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import init_db
-from routers import users, posts, auth, prompts
+from routers import auth, posts, prompts
 
 load_dotenv()
 
@@ -31,7 +32,6 @@ app.add_middleware(
 
 app.include_router(prompts.router, prefix="/api/prompts", tags=["Prompts"])
 app.include_router(posts.router, prefix="/api/posts", tags=["Posts"])
-app.include_router(users.router, prefix="/api/users", tags=["Users"])
 app.include_router(auth.router, prefix="/api/auth", tags=["Auth"])
 
 @app.get("/test-token")
