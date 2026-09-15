@@ -16,11 +16,11 @@ A private, personal journaling app for mindful self-reflection. Luma lets you wr
 - **Daily reflection prompt** — A new curated prompt each day, automatically rotated (no manual setup needed)
 - **Mood tracking** — Log your mood per entry: Great, Good, Okay, Low, or Difficult
 - **Hashtags** — Tag entries to identify recurring themes
-- **Search** — Full-text search across all your entries by content or hashtag
+- **Search** — Search your journal entries by title, content, or hashtag
 - **Analytics**
   - Daily and weekly mood trend charts
   - Mood distribution breakdown
-  - 12-week streak history heatmap
+  - Writing activity heatmap
   - Writing patterns by day of week
   - Top tags usage chart
   - Data-driven personal insights
@@ -32,9 +32,10 @@ A private, personal journaling app for mindful self-reflection. Luma lets you wr
 
 ## Tech Stack
 
-### Frontend
+### Frontend stack
+
 | Tool | Purpose |
-|---|---|
+| --- | --- |
 | React 19 + TypeScript | UI framework |
 | Vite 7 | Build tool |
 | Tailwind CSS v4 | Styling |
@@ -45,8 +46,9 @@ A private, personal journaling app for mindful self-reflection. Luma lets you wr
 | Lucide React | Icons |
 
 ### Backend
+
 | Tool | Purpose |
-|---|---|
+| --- | --- |
 | FastAPI | REST API framework |
 | SQLAlchemy | ORM |
 | PostgreSQL (Neon) | Database |
@@ -55,8 +57,9 @@ A private, personal journaling app for mindful self-reflection. Luma lets you wr
 | Uvicorn | ASGI server |
 
 ### Deployment
+
 | Service | What |
-|---|---|
+| --- | --- |
 | Vercel | Frontend — auto-deploys on push to `main` |
 | Render | Backend — auto-deploys on commit |
 
@@ -79,10 +82,9 @@ Luma/
 │
 └── backend/               # FastAPI app
     ├── routers/
-    │   ├── auth.py        # Login, register, JWT
+    │   ├── auth.py        # Authentication, user profile, password management
     │   ├── posts.py       # Journal entry CRUD (user-scoped)
-    │   ├── prompts.py     # Daily prompt — static list, date-seeded rotation
-    │   └── users.py       # User profile, password change
+    │   └── prompts.py     # Daily prompt — static list, date-seeded rotation
     ├── models.py          # SQLAlchemy models
     ├── schemas.py         # Pydantic request/response schemas
     ├── database.py        # DB connection and session
@@ -94,6 +96,7 @@ Luma/
 ## Local Development
 
 ### Prerequisites
+
 - Node.js 18+
 - Python 3.11+
 - PostgreSQL database (or a [Neon](https://neon.tech) connection string)
@@ -146,17 +149,19 @@ App runs at `http://localhost:5173`.
 ## API Overview
 
 | Method | Endpoint | Description |
-|---|---|---|
+| --- | --- | --- |
 | POST | `/api/auth/register` | Create account |
 | POST | `/api/auth/login` | Login, returns JWT |
 | GET | `/api/posts/` | Get all entries for current user |
+| GET | `/api/posts/{id}` | Get a specific entry |
 | POST | `/api/posts/` | Create a new entry |
 | PUT | `/api/posts/{id}` | Update an entry |
 | DELETE | `/api/posts/{id}` | Delete an entry |
 | GET | `/api/prompts/prompt-of-the-day` | Get today's reflection prompt |
-| GET | `/api/users/me` | Get current user profile |
-| PUT | `/api/users/me` | Update profile |
-| PUT | `/api/users/me/password` | Change password |
+| GET | `/api/auth/me` | Get current user profile |
+| PATCH | `/api/auth/me` | Update profile |
+| POST | `/api/auth/change-password` | Change password |
+| POST | `/api/auth/logout` | Logout |
 
 All protected routes require an `Authorization: Bearer <token>` header.
 
@@ -164,17 +169,19 @@ All protected routes require an `Authorization: Bearer <token>` header.
 
 ## Environment Variables
 
-### Backend (`backend/.env`)
+### Backend environment (`backend/.env`)
+
 | Variable | Description |
-|---|---|
+| --- | --- |
 | `DATABASE_URL` | PostgreSQL connection string |
 | `SECRET_KEY` | JWT signing secret |
 | `ALGORITHM` | JWT algorithm (default: `HS256`) |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | Token lifetime in minutes |
 
-### Frontend (`frontend/.env`)
+### Frontend environment (`frontend/.env`)
+
 | Variable | Description |
-|---|---|
+| --- | --- |
 | `VITE_API_URL` | Backend base URL |
 
 ---
