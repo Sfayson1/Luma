@@ -4,12 +4,12 @@ from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, status, Response
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
 from database import get_db
 from models import User
 from schemas import UserOut, UserLogin, UserRegister, Token, UserUpdate, PasswordChange
+from utils import hash_password, verify_password
 
 router = APIRouter()
 
@@ -22,7 +22,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
 if not SECRET_KEY:
     raise RuntimeError("SECRET_KEY is not set. Add it to your .env and Render environment variables.")
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def create_access_token(data: dict) -> str:
@@ -81,7 +80,7 @@ def register(user_data: UserRegister, db: Session = Depends(get_db)):
         first_name=first_name,
         last_name=last_name,
         email=user_data.email,
-        hashed_password=pwd_context.hash(user_data.password),
+        hashed_password=hash_password(user_data.password),
     )
     db.add(new_user)
     db.commit()
@@ -94,7 +93,7 @@ def register(user_data: UserRegister, db: Session = Depends(get_db)):
 @router.post("/login", response_model=Token)
 def login(user_data: UserLogin, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == user_data.email).first()
-    if not user or not pwd_context.verify(user_data.password, user.hashed_password):
+    if not user or not verify_password(user_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
@@ -128,11 +127,11 @@ def change_password(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    if not pwd_context.verify(body.current_password, current_user.hashed_password):
+    if not verify_password(body.current_password, current_user.hashed_password):
         raise HTTPException(status_code=400, detail="Current password is incorrect")
     if len(body.new_password) < 6:
         raise HTTPException(status_code=400, detail="New password must be at least 6 characters")
-    current_user.hashed_password = pwd_context.hash(body.new_password)
+    current_user.hashed_password = hash_password(body.new_password)
     db.commit()
     return {"message": "Password updated successfully"}
 
