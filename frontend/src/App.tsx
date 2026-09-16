@@ -10,7 +10,7 @@ import { ThemeProvider } from "./components/ui/theme-provider";
 import Landing from "./pages/Landing";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
-import DashboardPage from './pages/ DashboardPage';
+import DashboardPage from './pages/DashboardPage';
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import AuthPage from "./pages/AuthPage";
 import NotFound from "./pages/NotFound";
