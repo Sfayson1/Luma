@@ -34,7 +34,7 @@ type PostFromApi = {
   privacy: string;
   tags?: string | null; // currently a string in your schema
   prompt_id?: number | null;
-  owner_id: string;
+  owner_id: number;
 };
 
 function toYYYYMMDD(dateValue: string): string {
