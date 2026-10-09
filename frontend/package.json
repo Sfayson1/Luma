@@ -52,7 +52,7 @@
     "@tiptap/extension-typography": "^3.0.9",
     "@tiptap/extensions": "^3.0.9",
     "@tiptap/pm": "^3.0.9",
-    "@tiptap/react": "^3.0.9",
+    "@tiptap/react": "^3.31.4",
     "@tiptap/starter-kit": "^3.0.9",
     "class-variance-authority": "^0.7.1",
     "date-fns": "^4.1.0",
