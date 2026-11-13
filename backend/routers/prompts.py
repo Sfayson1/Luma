@@ -1,4 +1,4 @@
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 
 from fastapi import APIRouter
 from pydantic import BaseModel
@@ -78,7 +78,7 @@ class PromptResponse(BaseModel):
 
 @router.get("/prompt-of-the-day", response_model=PromptResponse)
 def get_prompt_of_the_day():
-    today = datetime.now(timezone.utc).date()
+    today = datetime.now(UTC).date()
     index = today.toordinal() % len(PROMPTS)
     return PromptResponse(
         id=index + 1,

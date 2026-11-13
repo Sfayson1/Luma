@@ -4,7 +4,7 @@ All tests run without a database — the prompt-of-the-day endpoint
 uses a static in-memory list, making it fast and dependency-free.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 # Import the router directly and build a minimal app so we don't need
 # a running database or real environment variables.
@@ -42,7 +42,7 @@ def test_prompt_content_is_non_empty_string():
 def test_prompt_date_is_today():
     response = client.get("/api/prompts/prompt-of-the-day")
     data = response.json()
-    assert data["date_created"] == datetime.now(timezone.utc).date().isoformat()
+    assert data["date_created"] == datetime.now(UTC).date().isoformat()
 
 
 def test_prompt_is_deterministic_same_day():
