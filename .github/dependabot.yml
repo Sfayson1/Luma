@@ -15,6 +15,11 @@ updates:
       tiptap:
         patterns:
           - "@tiptap/*"
+      vite:
+        patterns:
+          - "vite"
+          - "@vitejs/*"
+          - "@tailwindcss/vite"
 
   - package-ecosystem: "github-actions"
     directory: "/"
